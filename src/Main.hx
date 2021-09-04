@@ -40,7 +40,11 @@ class Main {
 		// List JSON keys
 		var jsonKeys : Map<String,String> = new Map();
 		iterateJson(json, jsonKeys);
-		verbose("Found "+Lambda.count(jsonKeys)+" key(s) in JSON.");
+		if( VERBOSE ) {
+			var n = 0;
+			for(k in jsonKeys) n++;
+			verbose("Found "+n+" key(s) in JSON.");
+		}
 
 		// Parse HTML template
 		var tplPath = dn.FilePath.cleanUp( libDir+"/tpl/default.html", true );
