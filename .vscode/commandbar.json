@@ -14,11 +14,19 @@
       },
       {
         "text": "(Run)",
-        "color": "orange",
-        "command": "haxelib run presskit -v",
+        "color": "cyan",
+        "command": "haxelib run presskit presskit_example.json",
         "alignment": "right",
         "skipTerminateQuickPick": false,
         "priority": 4
+      },
+      {
+        "text": "(Run verbose)",
+        "color": "cyan",
+        "command": "haxelib run presskit presskit_example.json -v",
+        "alignment": "right",
+        "skipTerminateQuickPick": false,
+        "priority": 3
       },
       {
         "text": "➠ Submit to haxelib",
