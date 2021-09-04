@@ -19,21 +19,23 @@ class Main {
 
 		var args = new dn.Args(
 			Sys.args().join(" "),
-			[ "-tpl" => 1 ]
+			[]
+			// [ "-tpl" => 1 ]
 		);
 		var libDir = args.getLastSoloValue();
 		var jsonPath = args.getFirstSoloValue();
 		if( args.getAllSoloValues().length==1 )
 			jsonPath = DEFAULT_JSON;
+		jsonPath = dn.FilePath.cleanUp( jsonPath, true );
 
 		VERBOSE = args.hasArg("-v");
 
 		// Parse JSON
 		verbose('Reading JSON: $jsonPath...');
 		if( !sys.FileSystem.exists(jsonPath) )
-			error('File not found: $jsonPath');
-		var raw = try sys.io.File.getContent(jsonPath) catch(_) { error('Could not open: $jsonPath'); null; }
-		var json = try haxe.Json.parse(raw) catch(_) { error('Could not parse JSON: $jsonPath'); null; }
+			error('File not found: $jsonPath', true);
+		var rawJson = try sys.io.File.getContent(jsonPath) catch(_) { error('Could not open: $jsonPath'); null; }
+		var json = try haxe.Json.parse(rawJson) catch(_) { error('Could not parse JSON: $jsonPath'); null; }
 
 		// List JSON keys
 		var jsonKeys : Map<String,String> = new Map();
@@ -41,8 +43,40 @@ class Main {
 		verbose("Found "+Lambda.count(jsonKeys)+" key(s) in JSON.");
 
 		// Parse HTML template
+		var tplPath = dn.FilePath.cleanUp( libDir+"/tpl/default.html", true );
+		verbose('Reading HTML template: $tplPath...');
+		var rawTpl = try sys.io.File.getContent(tplPath) catch(_) { error('Could not open: $tplPath'); null; }
+
+		// List HTML keys
+		var tplKeys : Map<String,String> = new Map();
+		var keysReg = ~/%([a-z_ ]+[0-9]*)%/im;
+		var tmp = rawTpl;
+		while( keysReg.match(tmp) ) {
+			var key = keysReg.matched(1);
+			tplKeys.set(key,key);
+			tmp = keysReg.matchedRight();
+		}
+
+		// Check missing JSON keys
+		for( tplKey in tplKeys.keys() )
+			if( !jsonKeys.exists(tplKey) )
+				error('Key "$tplKey" required by your HTML template isn\'t defined in $jsonPath!');
+
+		// Check unused JSON keys
+		for( jsonKey in jsonKeys.keys() )
+			if( !tplKeys.exists(jsonKey) )
+				Lib.println('WARNING: key "$jsonKey" from your JSON isn\'t used in your HTML template.');
 
 		// Build HTML
+		var htmlOut = rawTpl;
+		for( jk in jsonKeys.keyValueIterator() )
+			htmlOut = StringTools.replace(htmlOut, "%"+jk.key+"%", jk.value);
+
+		// Save HTML
+		sys.io.File.saveContent(libDir+"/test.html", htmlOut);
+
+		// Copy dependencies (CSS etc.)
+		// TODO
 	}
 
 	static function verbose(str:String) {
@@ -122,10 +156,13 @@ class Main {
 		Sys.exit(exitCode);
 	}
 
-	static function error(msg:Dynamic) {
+	static function error(msg:Dynamic, showUsage=false) {
 		Lib.println("");
 		Lib.println("ERROR: "+Std.string(msg));
-		usage(1);
+		if( showUsage )
+			usage(1);
+		else
+			Sys.exit(1);
 	}
 }
 
