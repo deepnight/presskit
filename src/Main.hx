@@ -103,8 +103,11 @@ class Main {
 				case TObject:
 					iterateJson( Reflect.field(o,field), allKeys, key );
 
+				case TClass(Array):
+					error("Unsupported array in JSON value: "+field);
+
 				case TClass(_), TBool, TFunction, TEnum(_), TUnknown:
-					error("Unsupporter JSON value: "+field+" ("+Type.typeof(v)+")");
+					error("Unsupported JSON value: "+field+" ("+Type.typeof(v)+")");
 			}
 		}
 	}
