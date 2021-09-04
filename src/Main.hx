@@ -73,7 +73,9 @@ class Main {
 			htmlOut = StringTools.replace(htmlOut, "%"+jk.key+"%", jk.value);
 
 		// Save HTML
-		sys.io.File.saveContent(libDir+"/test.html", htmlOut);
+		var tplOutPath = dn.FilePath.fromFile(jsonPath);
+		tplOutPath.extension = "html";
+		sys.io.File.saveContent(tplOutPath.full, htmlOut);
 
 		// Copy dependencies (CSS etc.)
 		// TODO
