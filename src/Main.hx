@@ -23,8 +23,9 @@ class Main {
 			[]
 			// [ "-tpl" => 1 ]
 		);
-		var libDir = args.getLastSoloValue();
-		var tplDir = libDir+"/tpl";
+		var projectDir = args.getLastSoloValue();
+		var haxelibDir = Sys.getCwd();
+		var tplDir = haxelibDir+"/tpl";
 
 		// Inits
 		var srcKeys : Map<String,String> = new Map();
@@ -34,7 +35,7 @@ class Main {
 		var srcPath = args.getFirstSoloValue();
 		if( args.getAllSoloValues().length==1 )
 			srcPath = DEFAULT_SRC;
-		var srcFp = dn.FilePath.fromFile(srcPath);
+		var srcFp = dn.FilePath.fromFile(projectDir+"/"+srcPath);
 		verbose('Reading source file: ${srcFp.full}...');
 		if( !sys.FileSystem.exists(srcFp.full) ) {
 			if( srcPath==DEFAULT_SRC )
