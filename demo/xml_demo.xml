@@ -1,7 +1,5 @@
-<gameTitle> Nuclear Blaze SCP </gameTitle>
-<author> [Deepnight Games](https://deepnight.net) </author>
-<appId> 1662480 </appId>
-<about>
+<game>
+	<title> Nuclear Blaze </title>
 	<pitch>
 		A *unique* 2D firefighting game from the creator of **[Dead Cells](https://deadcells.com)**, with all the devastating backdrafts, exploding walls and sprinklers you could expect.
 		Fight your way through a ~secret SCP complex~ mysterious facility and try to keep the blaze under control.
@@ -11,5 +9,10 @@
 		- another point
 		- oh and one *last* thing!
 	</features>
-	<year> 2021 </year>
-</about>
+	<release> 2021 </release>
+</game>
+
+<company>
+	<name> Deepnight Games </name>
+	<url> https://deepnight.net </url>
+</company>

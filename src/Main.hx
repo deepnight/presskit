@@ -24,6 +24,7 @@ class Main {
 			// [ "-tpl" => 1 ]
 		);
 		var libDir = args.getLastSoloValue();
+		var tplDir = libDir+"/tpl";
 
 		// Inits
 		var srcKeys : Map<String,String> = new Map();
@@ -56,9 +57,34 @@ class Main {
 		}
 
 		// Parse HTML template
-		var tplPath = dn.FilePath.cleanUp( libDir+"/tpl/default.html", true );
+		var tplPath = dn.FilePath.cleanUp( tplDir+"/default.html", true );
 		verbose('Reading HTML template: $tplPath...');
 		var rawTpl = try sys.io.File.getContent(tplPath) catch(_) { error('Could not open: $tplPath'); null; }
+
+
+		// List template dependencies (CSS etc.)
+		var tplDependencies = [];
+		var doc = try Xml.parse(rawTpl) catch(e) { error("Final HTML parsing failed: "+e); null; }
+		var html = new haxe.xml.Access(doc);
+		var fileUriReg = ~/^(.*?)(\?|$)/gi;
+		iterateHtml(html, n->{
+			switch n.name {
+				case "link":
+					if( n.has.href ) {
+						fileUriReg.match(n.att.href);
+						tplDependencies.push( fileUriReg.matched(1) );
+					}
+
+				case "img":
+					if( n.has.src ) {
+						fileUriReg.match(n.att.src);
+						tplDependencies.push( fileUriReg.matched(1) );
+					}
+
+				case _:
+			}
+		});
+
 
 		// List HTML keys
 		var tplKeys : Map<String,String> = new Map();
@@ -125,8 +151,14 @@ class Main {
 		if( !VERBOSE )
 			Lib.println('Saved: ${tplOutPath.full}');
 
-		// Copy dependencies (CSS etc.)
-		// TODO
+		// Copy template depencies
+		verbose('Copying template dependencies (${tplDependencies.length})...');
+		for( f in tplDependencies ) {
+			var from = dn.FilePath.cleanUp( tplDir+"/"+f, true );
+			var to = dn.FilePath.cleanUp( tplOutPath.directory+"/"+f, true );
+			verbose(' -> $from => $to...');
+			sys.io.File.copy(from,to);
+		}
 
 		Lib.println("Done.");
 	}
@@ -277,6 +309,18 @@ class Main {
 			}
 		}
 	}
+
+
+
+
+	static function iterateHtml(node:haxe.xml.Access, cb:haxe.xml.Access->Void) {
+		for(c in node.elements) {
+			cb(c);
+			iterateHtml(c, cb);
+		}
+	}
+
+
 
 	// static function hasParameter(id:String) {
 	// 	for( p in Sys.args() )
