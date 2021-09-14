@@ -190,7 +190,6 @@ class Main {
 		str = dn.Lib.wtrim(str);
 		str = simpleTag(str, "**", "strong");
 		str = simpleTag(str, "*", "em");
-		str = simpleTag(str, "_", "u");
 		str = simpleTag(str, "~", "strike");
 
 		var linkReg = ~/\[(.*?)\]\((.*?)\)/gi;
@@ -376,7 +375,7 @@ class Main {
 			Lib.println('  -v: enable verbose mode');
 			Lib.println("");
 			Lib.println('NOTES:');
-			Lib.println('  Basic markdown style formatting is supported: bold (**), italic (*), underline (_), striked (~) and links ( [desc](url) ).');
+			Lib.println('  Basic markdown style formatting is supported: bold (**), italic (*), striked (~) and links ( [desc](url) ).');
 			Lib.println('  See demo folder for some examples.');
 		}
 		else
