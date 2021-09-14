@@ -13,20 +13,28 @@
         "priority": 5
       },
       {
-        "text": "(Run)",
+        "text": "Run default",
         "color": "cyan",
-        "command": "haxelib run presskit presskit_example.json",
+        "command": "haxelib run presskit",
         "alignment": "right",
         "skipTerminateQuickPick": false,
         "priority": 4
       },
       {
-        "text": "(Run verbose)",
+        "text": "Run XML",
         "color": "cyan",
-        "command": "haxelib run presskit presskit_example.json -v",
+        "command": "haxelib run presskit demo/xml_demo.xml -o presskit.html -v",
         "alignment": "right",
         "skipTerminateQuickPick": false,
         "priority": 3
+      },
+      {
+        "text": "Run JSON",
+        "color": "cyan",
+        "command": "haxelib run presskit demo/json_demo.json -v",
+        "alignment": "right",
+        "skipTerminateQuickPick": false,
+        "priority": 2
       },
       {
         "text": "➠ Submit to haxelib",
