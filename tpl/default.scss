@@ -13,6 +13,7 @@ body {
 	grid-template-columns: 20em auto;
 	max-width: 900px;
 	margin: auto;
+	padding-bottom: 4rem;
 
 	.factsheet {
 		grid-column: 1/2;
@@ -27,11 +28,6 @@ body {
 	.mainInfo {
 		grid-column: 2/3;
 		grid-row: 1/3;
-		text-align: justify;
-
-		ul li+li {
-			margin-top: 1em;
-		}
 	}
 
 
@@ -75,4 +71,31 @@ body {
 		}
 	}
 
+
+
+	/** Specific section design **/
+	.mainInfo {
+		text-align: justify;
+
+		ul li+li {
+			margin-top: 1em;
+		}
+	}
+
+	.images {
+		ul {
+			display: grid;
+			grid-template-columns: auto auto;
+			gap: 1em;
+			a {
+				font-size: 0;
+			}
+		}
+	}
+
+	.credits {
+		ul li+li {
+			margin-top: 1em;
+		}
+	}
 }
