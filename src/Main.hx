@@ -4,7 +4,7 @@ class Main {
 	static var DEFAULT_SRC = "presskit.xml";
 	static var DEFAULT_OUTPUT = "presskit";
 	static var VERBOSE = false;
-	static var LIST_REG = ~/^\s*-\s+(.*?)$/gi;
+	static var LIST_REG = ~/^\s*-\s+(.+?)$/gi;
 
 	static function main() {
 		haxe.Log.trace = function(m, ?pos) {
@@ -35,8 +35,12 @@ class Main {
 			srcPath = DEFAULT_SRC;
 		var srcFp = dn.FilePath.fromFile(srcPath);
 		verbose('Reading source file: ${srcFp.full}...');
-		if( !sys.FileSystem.exists(srcFp.full) )
-			error('File not found: ${srcFp.full}', true);
+		if( !sys.FileSystem.exists(srcFp.full) ) {
+			if( srcPath==DEFAULT_SRC )
+				usage();
+			else
+				error('File not found: ${srcFp.full}', true);
+		}
 		var rawSrc = try sys.io.File.getContent(srcFp.full) catch(_) { error('Could not open: ${srcFp.full}'); null; }
 
 		// Extract keys
@@ -94,17 +98,17 @@ class Main {
 						if( LIST_REG.match(line) ) {
 							// List element
 							wrapTag = "ul";
-							html += '<li>${LIST_REG.matched(1)}</li>\n';
+							html += '<li>${ formatLine( LIST_REG.matched(1) ) }</li>\n';
 						}
 						else
-							html += '<p>$line</p>\n';
+							html += '<p>${ formatLine(line) }</p>\n';
 
 				}
 				else
-					html = lines[0];
+					html = formatLine( lines[0] );
 			}
 			else
-				html = dn.Lib.wtrim(html);
+				html = formatLine(html);
 
 			// Optional parent wrapper
 			if( wrapTag!=null )
@@ -125,6 +129,41 @@ class Main {
 		// TODO
 
 		Lib.println("Done.");
+	}
+
+	static function simpleTag(str:String, tag:String, htmlOpen:String, ?htmlClose:String) {
+		var parts = str.split(tag);
+		if( parts.length%2==0 ) {
+			if( parts.length>0 )
+				error('Malformed "$tag" tag in source file');
+			return str;
+		}
+		else {
+			if( htmlClose==null )
+				htmlClose = htmlOpen;
+			str = "";
+			var odd = false;
+			for(p in parts) {
+				if( odd )
+					str += '<$htmlOpen>$p</$htmlClose>';
+				else
+					str += p;
+				odd = !odd;
+			}
+			return str;
+		}
+	}
+
+	static function formatLine(str:String) {
+		str = dn.Lib.wtrim(str);
+		str = simpleTag(str, "**", "strong");
+		str = simpleTag(str, "*", "em");
+		str = simpleTag(str, "_", "u");
+		str = simpleTag(str, "~", "strike");
+
+		var linkReg = ~/\[(.*?)\]\((.*?)\)/gi;
+		str = linkReg.replace(str, '<a href="$2">$1</a>');
+		return str;
 	}
 
 
@@ -224,7 +263,14 @@ class Main {
 					iterateJson( Reflect.field(o,field), allKeys, key );
 
 				case TClass(Array):
-					error("Unsupported array in JSON value: "+field);
+					var arr : Array<Dynamic> = cast v;
+					for(e in arr)
+						switch Type.typeof(e) {
+							case TClass(String):
+							case _:
+								error("Unsupported array type in JSON value: "+field);
+						}
+					allKeys.set( key, arr.join("\n") );
 
 				case TClass(_), TBool, TFunction, TEnum(_), TUnknown:
 					error("Unsupported JSON value: "+field+" ("+Type.typeof(v)+")");
@@ -270,18 +316,28 @@ class Main {
 
 	static function usage(exitCode=0) {
 		Lib.println("");
-		Lib.println("USAGE:");
-		Lib.println("  haxelib run presskit [json_file] [-o <target_dir>");
-		Lib.println("");
-		Lib.println("EXAMPLES:");
-		Lib.println("  haxelib run presskit");
-		Lib.println("  haxelib run presskit myGamePresskit.xml -o docs/presskit");
-		Lib.println("  haxelib run presskit myGamePresskit.json");
-		Lib.println("");
-		Lib.println("ARGUMENTS:");
-		Lib.println('  source_file: path to your presskit XML or JSON (default is "./$DEFAULT_SRC")');
-		Lib.println('  -o <target_dir>: change the default redistHelper output dir (default "./$DEFAULT_OUTPUT/")');
-		Lib.println('  -v: enable verbose mode');
+
+		if( exitCode==0 ) {
+			Lib.println("USAGE:");
+			Lib.println("  haxelib run presskit [json_file] [-o <target_dir>");
+			Lib.println("");
+			Lib.println("EXAMPLES:");
+			Lib.println("  haxelib run presskit");
+			Lib.println("  haxelib run presskit myGamePresskit.xml -o docs/presskit");
+			Lib.println("  haxelib run presskit myGamePresskit.json");
+			Lib.println("");
+			Lib.println("ARGUMENTS:");
+			Lib.println('  source_file: path to your presskit XML or JSON (default is "./$DEFAULT_SRC")');
+			Lib.println('  -o <target_dir>: change the default redistHelper output dir (default "./$DEFAULT_OUTPUT/")');
+			Lib.println('  -v: enable verbose mode');
+			Lib.println("");
+			Lib.println('NOTES:');
+			Lib.println('  Basic markdown style formatting is supported: bold (**), italic (*), underline (_), striked (~) and links ( [desc](url) ).');
+			Lib.println('  See demo folder for some examples.');
+		}
+		else
+			Lib.println("For help, just run:  haxelib run presskit");
+
 		Lib.println("");
 		Sys.exit(exitCode);
 	}
@@ -293,7 +349,9 @@ class Main {
 
 	static function error(msg:Dynamic, showUsage=false) {
 		Lib.println("");
+		Lib.println("--------------------------------------------------------------");
 		Lib.println("ERROR: "+Std.string(msg));
+		Lib.println("--------------------------------------------------------------");
 		if( showUsage )
 			usage(1);
 		else
