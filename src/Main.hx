@@ -4,6 +4,7 @@ class Main {
 	static var DEFAULT_SRC = "presskit.xml";
 	static var DEFAULT_OUTPUT = "presskit";
 	static var VERBOSE = false;
+	static var LIST_REG = ~/^\s*-\s+(.*?)$/gi;
 
 	static function main() {
 		haxe.Log.trace = function(m, ?pos) {
@@ -75,24 +76,39 @@ class Main {
 			if( !tplKeys.exists(jsonKey) )
 				warning('key "$jsonKey" from your Source file isn\'t used in your HTML template.');
 
-		
+
 		// Build HTML
 		verbose('Building HTML...');
 		var htmlOut = rawTpl;
 		for( jk in srcKeys.keyValueIterator() ) {
 			var html = jk.value;
 
-			// Create paragraphs for multilines
+			var wrapTag : Null<String> = null;
+
 			if( html.indexOf("\n")>=0 ) {
-				var lines = html.split("\n");
-				html = "";
-				for( line in lines ) {
-					var line = dn.Lib.wtrim(line);
-					if( line.length==0 )
-						continue;
-					html += '<p>$line</p>\n';
+				// Create paragraphs or lists for multilines
+				var lines = html.split("\n").map( line->dn.Lib.wtrim(line) ).filter( line->line.length>0 );
+				if( lines.length>1 ) {
+					html = "";
+					for( line in lines )
+						if( LIST_REG.match(line) ) {
+							// List element
+							wrapTag = "ul";
+							html += '<li>${LIST_REG.matched(1)}</li>\n';
+						}
+						else
+							html += '<p>$line</p>\n';
+
 				}
+				else
+					html = lines[0];
 			}
+			else
+				html = dn.Lib.wtrim(html);
+
+			// Optional parent wrapper
+			if( wrapTag!=null )
+				html = '<$wrapTag>$html</$wrapTag>';
 
 			htmlOut = StringTools.replace(htmlOut, "%"+jk.key+"%", html);
 		}
