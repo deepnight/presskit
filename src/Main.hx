@@ -1,7 +1,7 @@
 import neko.Lib;
 
 class Main {
-	static var DEFAULT_JSON = "presskit.json";
+	static var DEFAULT_SRC = "presskit.xml";
 	static var DEFAULT_OUTPUT = "presskit";
 	static var VERBOSE = false;
 
@@ -23,27 +23,31 @@ class Main {
 			// [ "-tpl" => 1 ]
 		);
 		var libDir = args.getLastSoloValue();
-		var jsonPath = args.getFirstSoloValue();
-		if( args.getAllSoloValues().length==1 )
-			jsonPath = DEFAULT_JSON;
-		jsonPath = dn.FilePath.cleanUp( jsonPath, true );
 
+		// Inits
+		var srcKeys : Map<String,String> = new Map();
 		VERBOSE = args.hasArg("-v");
 
-		// Parse JSON
-		verbose('Reading JSON: $jsonPath...');
-		if( !sys.FileSystem.exists(jsonPath) )
-			error('File not found: $jsonPath', true);
-		var rawJson = try sys.io.File.getContent(jsonPath) catch(_) { error('Could not open: $jsonPath'); null; }
-		var json = try haxe.Json.parse(rawJson) catch(_) { error('Could not parse JSON: $jsonPath'); null; }
+		// Read source file
+		var srcPath = args.getFirstSoloValue();
+		if( args.getAllSoloValues().length==1 )
+			srcPath = DEFAULT_SRC;
+		var srcFp = dn.FilePath.fromFile(srcPath);
+		verbose('Reading source file: ${srcFp.full}...');
+		if( !sys.FileSystem.exists(srcFp.full) )
+			error('File not found: ${srcFp.full}', true);
+		var rawSrc = try sys.io.File.getContent(srcFp.full) catch(_) { error('Could not open: ${srcFp.full}'); null; }
 
-		// List JSON keys
-		var jsonKeys : Map<String,String> = new Map();
-		iterateJson(json, jsonKeys);
-		if( VERBOSE ) {
-			var n = 0;
-			for(k in jsonKeys) n++;
-			verbose("Found "+n+" key(s) in JSON.");
+		// Extract keys
+		switch srcFp.extension.toLowerCase() {
+			case "json":
+				srcKeys = parseJson(rawSrc);
+
+			case "xml":
+				srcKeys = parseXml(rawSrc);
+
+			case _:
+				error("Unsupported source file extension: "+srcFp.extension);
 		}
 
 		// Parse HTML template
@@ -63,32 +67,132 @@ class Main {
 
 		// Check missing JSON keys
 		for( tplKey in tplKeys.keys() )
-			if( !jsonKeys.exists(tplKey) )
-				error('Key "$tplKey" required by your HTML template isn\'t defined in $jsonPath!');
+			if( !srcKeys.exists(tplKey) )
+				warning('key "$tplKey" required by your HTML template isn\'t defined in ${srcFp.fileWithExt}!');
 
-		// Check unused JSON keys
-		for( jsonKey in jsonKeys.keys() )
+		// Check unused source keys
+		for( jsonKey in srcKeys.keys() )
 			if( !tplKeys.exists(jsonKey) )
-				Lib.println('WARNING: key "$jsonKey" from your JSON isn\'t used in your HTML template.');
+				warning('key "$jsonKey" from your Source file isn\'t used in your HTML template.');
 
+		
 		// Build HTML
+		verbose('Building HTML...');
 		var htmlOut = rawTpl;
-		for( jk in jsonKeys.keyValueIterator() )
-			htmlOut = StringTools.replace(htmlOut, "%"+jk.key+"%", jk.value);
+		for( jk in srcKeys.keyValueIterator() ) {
+			var html = jk.value;
+
+			// Create paragraphs for multilines
+			if( html.indexOf("\n")>=0 ) {
+				var lines = html.split("\n");
+				html = "";
+				for( line in lines ) {
+					var line = dn.Lib.wtrim(line);
+					if( line.length==0 )
+						continue;
+					html += '<p>$line</p>\n';
+				}
+			}
+
+			htmlOut = StringTools.replace(htmlOut, "%"+jk.key+"%", html);
+		}
 
 		// Save HTML
-		var tplOutPath = dn.FilePath.fromFile(jsonPath);
+		var tplOutPath = dn.FilePath.fromFile(srcFp.full);
 		tplOutPath.extension = "html";
+		verbose('Saving HTML: ${tplOutPath.full}...');
 		sys.io.File.saveContent(tplOutPath.full, htmlOut);
+		if( !VERBOSE )
+			Lib.println('Saved: ${tplOutPath.full}');
 
 		// Copy dependencies (CSS etc.)
 		// TODO
+
+		Lib.println("Done.");
 	}
+
+
+	static function parseJson(raw:String) {
+		// Parse
+		var json = try haxe.Json.parse(raw) catch(e) { error('JSON parsing failed: $e'); null; }
+
+		// Extract keys
+		var srcKeys : Map<String,String> = new Map();
+		iterateJson(json, srcKeys);
+		if( VERBOSE ) {
+			var n = 0;
+			for(k in srcKeys) n++;
+			verbose(" -> Found "+n+" key(s) in JSON.");
+		}
+
+		return srcKeys;
+	}
+
+
+	static function parseXml(raw:String) {
+		// Parse
+		var doc = try Xml.parse(raw) catch(e) { error('XML parsing failed: $e'); null; }
+		var xml = new haxe.xml.Access(doc);
+
+		// Extract keys
+		var srcKeys : Map<String,String> = new Map();
+		iterateXml(xml, srcKeys);
+		if( VERBOSE ) {
+			var n = 0;
+			for(k in srcKeys) n++;
+			verbose(" -> Found "+n+" key(s) in XML.");
+		}
+
+		return srcKeys;
+	}
+
 
 	static function verbose(str:String) {
 		if( VERBOSE )
 			Lib.println(str);
 	}
+
+
+	static var HTML_TAGS = [
+		"p", "div", "span", "pre", "a", "q", "quote", "blockquote",
+		"ul", "dl", "ol", "li", "dt", "dd",
+		"table", "form", "img",
+		"h1", "h2", "h3", "h4", "h5", "h6",
+		"em", "i", "strong", "b",
+		"br", "hr",
+	];
+	static var IGNORED_HTML_TAGS = {
+		var m = new Map();
+		for(t in HTML_TAGS)
+			m.set(t,t);
+		m;
+	}
+
+
+	static function iterateXml(node:haxe.xml.Access, allKeys:Map<String,String>, ?parentKey:String) {
+		var containsSubNodes = false;
+
+		for(c in node.elements) {
+			if( IGNORED_HTML_TAGS.exists(c.name.toLowerCase()) )
+				continue;
+
+			containsSubNodes = true;
+			var key = parentKey==null ? c.name : parentKey+"_"+c.name;
+
+			// Duplicates
+			if( allKeys.exists(key) )
+				warning('Duplicate key $key in Source file');
+
+			if( !iterateXml(c, allKeys, key) ) {
+				// Only register HTML block if there's no key inside of it
+				allKeys.set(key, c.innerHTML);
+			}
+		}
+
+		return containsSubNodes;
+	}
+
+
 
 	static function iterateJson(o:Dynamic, allKeys:Map<String,String>, ?parentKey:String) {
 		for(field in Reflect.fields(o)) {
@@ -155,15 +259,21 @@ class Main {
 		Lib.println("");
 		Lib.println("EXAMPLES:");
 		Lib.println("  haxelib run presskit");
+		Lib.println("  haxelib run presskit myGamePresskit.xml -o docs/presskit");
 		Lib.println("  haxelib run presskit myGamePresskit.json");
 		Lib.println("");
 		Lib.println("ARGUMENTS:");
-		Lib.println('  json_file: path to your presskit JSON (default is "./$DEFAULT_JSON")');
+		Lib.println('  source_file: path to your presskit XML or JSON (default is "./$DEFAULT_SRC")');
 		Lib.println('  -o <target_dir>: change the default redistHelper output dir (default "./$DEFAULT_OUTPUT/")');
 		Lib.println('  -v: enable verbose mode');
 		Lib.println("");
 		Sys.exit(exitCode);
 	}
+
+	static function warning(msg:Dynamic) {
+		Lib.println(" -> WARNING: "+Std.string(msg));
+	}
+
 
 	static function error(msg:Dynamic, showUsage=false) {
 		Lib.println("");
