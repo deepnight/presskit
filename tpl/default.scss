@@ -11,6 +11,7 @@ body {
 .presskit {
 	display: grid;
 	grid-template-columns: 20em auto;
+	grid-template-rows: 0fr 1fr;
 	max-width: 900px;
 	margin: auto;
 	padding-bottom: 4rem;
@@ -74,6 +75,11 @@ body {
 
 
 	/** Specific section design **/
+
+	menu.main {
+		margin-bottom: 1em;
+	}
+
 	.mainInfo {
 		text-align: justify;
 
