@@ -10,18 +10,22 @@
 	<pitch>
 		<img src="img/keyart.png"/>
 		A *unique* 2D firefighting game from the creator of **[Dead Cells](https://deadcells.com)**, with all the devastating backdrafts, exploding walls and sprinklers you could expect.
-		Fight your way through a ~secret SCP complex~ mysterious facility and try to keep the blaze under control.
+
+		Fight your way through a ~~secret SCP complex~~ mysterious facility and try to keep the blaze under control.
 	</pitch>
 
 	<desc>
 	</desc>
 
 	<features>
-	    - A unique 2D firefighting game with all the devastating backdrafts, exploding walls and sprinklers you could expect.
-    	- A short action adventure focused on quality over quantity,
-    	- Use your fire hose carefully to keep the blaze under control and progress through the facility.
-    	- Unravel the true story of Site 64-4 and S█████, deeply tied with the SCP universe. Reading this requires a clearance level #4, #██ or #█.
-    	- Not a roguelite/like/vania but rather an intense and short adventure, from the creator of Dead Cells.
+		- A unique 2D firefighting game with all the devastating backdrafts, exploding walls and sprinklers you could expect.
+		- A short action adventure focused on quality over quantity,
+		- Use your fire hose carefully to keep the blaze under control and progress through the facility.
+		- Unravel the true story of Site 64-4 and S█████, deeply tied with the SCP universe. Reading this requires a clearance level #4, #██ or #█.
+		- Not a roguelite/like/vania but rather an intense and short adventure, from the creator of Dead Cells.
+			- sub list 1
+			- sub list 2
+		- last one
 	</features>
 	<release> 2021 </release>
 

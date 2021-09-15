@@ -49,7 +49,6 @@ body {
 		max-width: 100%;
 	}
 
-	ul,
 	menu {
 		list-style: none;
 		margin: 0;
@@ -86,13 +85,22 @@ body {
 		ul li+li {
 			margin-top: 1em;
 		}
+		ul ul {
+			margin-top: 1em;
+			margin-bottom: 1em;
+		}
 	}
 
 	.images {
 		ul {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+
 			display: grid;
 			grid-template-columns: auto auto;
 			gap: 1em;
+			
 			a {
 				font-size: 0;
 			}

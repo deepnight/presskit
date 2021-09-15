@@ -4,7 +4,7 @@ class Main {
 	static var DEFAULT_SRC = "presskit.xml";
 	static var DEFAULT_OUTPUT = "presskit";
 	static var VERBOSE = false;
-	static var LIST_REG = ~/^\s*-\s+(.+?)$/gi;
+	static var LIST_REG = ~/^([ \t]*?)-\s+(.+?)$/gi;
 
 	static function main() {
 		haxe.Log.trace = function(m, ?pos) {
@@ -114,21 +114,63 @@ class Main {
 		for( jk in srcKeys.keyValueIterator() ) {
 			var html = jk.value;
 
-			var wrapTag : Null<String> = null;
-
 			if( html.indexOf("\n")>=0 ) {
 				// Create paragraphs or lists for multilines
-				var lines = html.split("\n").map( line->dn.Lib.wtrim(line) ).filter( line->line.length>0 );
+				var lines = html.split("\n").filter( line->dn.Lib.wtrim(line).length>0 );
 				if( lines.length>1 ) {
-					html = "";
-					for( line in lines )
+
+					var inserts = [];
+					var curWraps = [];
+					function _wrapList(idx:Int, depth:Int) {
+						trace('wrap at $idx, depth=$depth');
+						if( curWraps.length==0 && depth<0 )
+							return;
+						else if( curWraps.length==0 || curWraps[curWraps.length-1].depth < depth ) {
+							curWraps.push({ idx:idx, depth:depth });
+							trace("START "+curWraps);
+						}
+						else if( curWraps[curWraps.length-1].depth > depth ) {
+							// Close last
+							trace("CLOSE "+curWraps);
+							var startIdx = curWraps.pop().idx;
+							// if( curWraps.length>0 ) {
+							// 	inserts.push({ idx:startIdx, str:'<li><ul>' });
+							// 	inserts.push({ idx:idx, str:'</ul></li>' });
+							// }
+							// else {
+								inserts.push({ idx:startIdx, str:'<ul>' });
+								inserts.push({ idx:idx, str:'</ul>' });
+							// }
+						}
+					}
+
+
+					for( i in 0...lines.length ) {
+						var line = lines[i];
+						trace(line);
 						if( LIST_REG.match(line) ) {
 							// List element
-							wrapTag = "ul";
-							html += '<li>${ formatLine( LIST_REG.matched(1) ) }</li>\n';
+							_wrapList(i, LIST_REG.matched(1).length);
+							lines[i] = '<li>${ formatLine( LIST_REG.matched(2) ) }</li>\n';
 						}
-						else
-							html += '<p>${ formatLine(line) }</p>\n';
+						else {
+							// Normal paragraph
+							while( curWraps.length>0 )
+								_wrapList(i, -1);
+							lines[i] = '<p>${ formatLine(line) }</p>\n';
+						}
+					}
+
+					// Close remaining wraps
+					while( curWraps.length>0 )
+						_wrapList(lines.length, -1);
+
+					inserts.sort( (a,b)->return -Reflect.compare(a.idx, b.idx) );
+					for(i in inserts)
+						lines.insert(i.idx, i.str);
+					trace(inserts);
+
+					html = lines.join("\n");
 
 				}
 				else
@@ -138,8 +180,8 @@ class Main {
 				html = formatLine(html);
 
 			// Optional parent wrapper
-			if( wrapTag!=null )
-				html = '<$wrapTag>$html</$wrapTag>';
+			// if( wrapTag!=null )
+			// 	html = '<$wrapTag>$html</$wrapTag>';
 
 			htmlOut = StringTools.replace(htmlOut, "%"+jk.key+"%", html);
 		}
@@ -191,7 +233,7 @@ class Main {
 		str = dn.Lib.wtrim(str);
 		str = simpleTag(str, "**", "strong");
 		str = simpleTag(str, "*", "em");
-		str = simpleTag(str, "~", "strike");
+		str = simpleTag(str, "~~", "strike");
 
 		var linkReg = ~/\[(.*?)\]\((.*?)\)/gi;
 		str = linkReg.replace(str, '<a href="$2">$1</a>');
