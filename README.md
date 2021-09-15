@@ -19,7 +19,7 @@ haxelib install presskit
 Run it in your project folder:
 ```
 haxelib run presskit
-haxelib run presskit docs/myPresskit.json
+haxelib run presskit docs/myPresskit.xml
 haxelib run presskit docs/myPresskit.json docs/myTemplate.html
 ```
 
