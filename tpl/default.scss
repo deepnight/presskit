@@ -8,9 +8,12 @@ body {
 }
 
 
+/**************************************
+ LAYOUT
+**************************************/
 .presskit {
 	display: grid;
-	grid-template-columns: 20em auto;
+	grid-template-columns: 14em auto;
 	grid-template-rows: 0fr 1fr;
 	max-width: 900px;
 	margin: auto;
@@ -55,6 +58,14 @@ body {
 		padding: 0;
 	}
 
+	ul li+li {
+		margin-top: 1em;
+	}
+	ul ul {
+		margin-top: 1em;
+		margin-bottom: 1em;
+	}
+
 	dl {
 		dt, dd {
 			margin: 0;
@@ -70,10 +81,23 @@ body {
 			padding-left: 0.3em;
 		}
 	}
+}
 
 
-
-	/** Specific section design **/
+/**************************************
+ Specific sections designs
+**************************************/
+.presskit {
+	a {
+		&:link,
+		&:visited {
+			color: #f14040;
+			text-decoration: none;
+		}
+		&:hover {
+			text-decoration: underline;
+		}
+	}
 
 	menu.main {
 		margin-bottom: 1em;
@@ -81,14 +105,6 @@ body {
 
 	.mainInfo {
 		text-align: justify;
-
-		ul li+li {
-			margin-top: 1em;
-		}
-		ul ul {
-			margin-top: 1em;
-			margin-bottom: 1em;
-		}
 	}
 
 	.images {
@@ -100,16 +116,14 @@ body {
 			display: grid;
 			grid-template-columns: auto auto;
 			gap: 1em;
-			
+
+			li {
+				margin: 0 !important;
+			}
+
 			a {
 				font-size: 0;
 			}
-		}
-	}
-
-	.credits {
-		ul li+li {
-			margin-top: 1em;
 		}
 	}
 }

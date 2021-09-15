@@ -1,8 +1,10 @@
 <game>
 	<title> Nuclear Blaze </title>
+
 	<url>
 		[Steam](https://store.steampowered.com/app/1662480/Nuclear_Blaze/)
 	</url>
+
 	<platforms>
 		[PC](https://store.steampowered.com/app/1662480/Nuclear_Blaze/)
 	</platforms>
@@ -14,8 +16,7 @@
 		Fight your way through a ~~secret SCP complex~~ mysterious facility and try to keep the blaze under control.
 	</pitch>
 
-	<desc>
-	</desc>
+	<desc></desc>
 
 	<features>
 		- A unique 2D firefighting game with all the devastating backdrafts, exploding walls and sprinklers you could expect.
@@ -29,9 +30,7 @@
 	</features>
 	<release> 2021 </release>
 
-	<videos>
-		TODO
-	</videos>
+	<videos></videos>
 
 	<images>
 		- <a href="img/screen0.png"><img src="img/screen0.png"/></a>
