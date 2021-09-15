@@ -5,6 +5,7 @@ class Main {
 	static var DEFAULT_OUTPUT = "presskit";
 	static var VERBOSE = false;
 	static var LIST_REG = ~/^([ \t]*?)-\s+(.+?)$/gi;
+	static var VAR_REG = ~/%([a-z0-9_]+)%/gi;
 
 	static function main() {
 		haxe.Log.trace = function(m, ?pos) {
@@ -391,21 +392,17 @@ class Main {
 
 		if( exitCode==0 ) {
 			Lib.println("USAGE:");
-			Lib.println("  haxelib run presskit [json_file] [-o <target_dir>");
-			Lib.println("");
-			Lib.println("EXAMPLES:");
-			Lib.println("  haxelib run presskit");
-			Lib.println("  haxelib run presskit myGamePresskit.xml -o docs/presskit");
-			Lib.println("  haxelib run presskit myGamePresskit.json");
+			Lib.println("  haxelib run presskit [<presskit_file>] [-v]");
+			// Lib.println("  haxelib run presskit [presskit_file] [-o <target_dir>");
 			Lib.println("");
 			Lib.println("ARGUMENTS:");
-			Lib.println('  source_file: path to your presskit XML or JSON (default is "./$DEFAULT_SRC")');
-			Lib.println('  -o <target_dir>: change the default redistHelper output dir (default "./$DEFAULT_OUTPUT/")');
-			Lib.println('  -v: enable verbose mode');
+			Lib.println('  <presskit_file>: optional path to your presskit XML or JSON (default is "./$DEFAULT_SRC")');
+			// Lib.println('  -o <target_dir>: change the default redistHelper output dir (default "./$DEFAULT_OUTPUT/")');
+			Lib.println('  -v: enable Verbose mode');
 			Lib.println("");
 			Lib.println('NOTES:');
-			Lib.println('  Basic markdown style formatting is supported: bold (**), italic (*), striked (~) and links ( [desc](url) ).');
-			Lib.println('  See demo folder for some examples.');
+			Lib.println('  Basic markdown style formatting is supported: bold (**), italic (*), striked (~~), lists, nested lists and links ( [desc](url) ).');
+			Lib.println('  See "demo" folder for some examples.');
 		}
 		else
 			Lib.println("For help, just run:  haxelib run presskit");
