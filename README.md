@@ -41,11 +41,13 @@ The XML/JSON is parsed and every entry found in it is given a unique name.
 
 In your HTML template, you may refer to any XML/JSON entry by just using its `%name%`, for example, `%game_title%` or `%company_url%`.
 
-## Example
+## Live demo
 
 You can see a live example here:
 
-**TODO URL**
+## Example 
+
+https://deepnight.net/files/presskit/nuclearBlaze/
 
 A typical XML file looks like:
 ```xml
