@@ -43,9 +43,7 @@ class Main {
 		var haxelibDir = dn.FilePath.cleanUp( Sys.getCwd(), false );
 		var tplFp = dn.FilePath.fromFile( argTpl!=null ? argTpl : haxelibDir +"/"+ DEFAULT_TPL);
 		var projectDir = dn.FilePath.cleanUp( args.getLastSoloValue(), false );
-		var srcFp = dn.FilePath.fromFile( argSrc!=null ? argSrc : projectDir+"/"+DEFAULT_SRC );
-		verbose('Template: $tplFp');
-		verbose('Source: $srcFp');
+		var srcFp = dn.FilePath.fromFile( argSrc!=null ? projectDir+"/"+argSrc : projectDir+"/"+DEFAULT_SRC );
 
 		var outputHtmlFile = srcFp.clone();
 		outputHtmlFile.appendDirectory("output");
@@ -57,17 +55,22 @@ class Main {
 		var srcKeys : Map<String,String> = new Map();
 		var tplKeys : Map<String,String> = new Map();
 
+
+		// Usage?
+		if( !sys.FileSystem.exists(srcFp.full) && argSrc==null )
+			usage();
+		Lib.println('Source: $srcFp');
+		Lib.println('Template: $tplFp');
+
+
 		// Read source file
-		Lib.println('Reading source file: ${srcFp.full}...');
-		if( !sys.FileSystem.exists(srcFp.full) ) {
-			if( argSrc==null )
-				usage();
-			else
-				error('File not found: ${srcFp.full}', true);
-		}
+		if( !sys.FileSystem.exists(srcFp.full) )
+			error('File not found: ${srcFp.full}', true);
+		verbose('Reading source file: ${srcFp.fileWithExt}...');
 		var rawSrc = try sys.io.File.getContent(srcFp.full) catch(_) { error('Could not open: ${srcFp.full}'); null; }
 
-		// Extract keys
+
+		// Extract source keys
 		switch srcFp.extension.toLowerCase() {
 			case "json":
 				srcKeys = parseJson(rawSrc);
@@ -79,12 +82,13 @@ class Main {
 				error("Unsupported source file extension: "+srcFp.extension);
 		}
 
+
 		// Parse HTML template
 		verbose('Reading HTML template: ${tplFp.full}}...');
 		var rawTpl = try sys.io.File.getContent(tplFp.full) catch(_) { error('Could not open: ${tplFp.full}'); null; }
 
 
-		// List HTML keys
+		// Extract HTML keys
 		var keysReg = ~/%([a-z_ ]+[0-9]*)%/im;
 		var tmp = rawTpl;
 		while( keysReg.match(tmp) ) {
@@ -179,7 +183,7 @@ class Main {
 		sys.FileSystem.createDirectory(outputHtmlFile.directory);
 		sys.io.File.saveContent(outputHtmlFile.full, htmlOut);
 		if( !VERBOSE )
-			Lib.println('Saved: ${outputHtmlFile.full}');
+			Lib.println('HTML output: ${outputHtmlFile.full}');
 
 
 		// List template dependencies (CSS, images etc.)
