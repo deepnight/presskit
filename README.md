@@ -1,6 +1,6 @@
 # Presskit for Haxe
 
-Presskit is a Haxe library that can generate static HTML presskits from either XML or JSON files.
+Presskit is a simple Haxe library that generates static HTML presskits from either XML or JSON source files.
 
  - Use either XML (recommended) or JSON to feed a HTML template.
  - Everything can be customized.
