@@ -40,7 +40,6 @@ class Main {
 		outputHtmlFile.appendDirectory("output");
 		outputHtmlFile.fileName = srcFp.fileName;
 		outputHtmlFile.extension = "html";
-		trace(outputHtmlFile);
 
 
 		// Inits
@@ -48,11 +47,7 @@ class Main {
 		VERBOSE = args.hasArg("-v");
 
 		// Read source file
-		// var srcPath = args.getFirstSoloValue();
-		// if( args.getAllSoloValues().length==1 )
-		// 	srcPath = DEFAULT_SRC;
-		// var srcFp = dn.FilePath.fromFile(projectDir+"/"+srcPath);
-		verbose('Reading source file: ${srcFp.full}...');
+		Lib.println('Reading source file: ${srcFp.full}...');
 		if( !sys.FileSystem.exists(srcFp.full) ) {
 			if( relSrcPath==DEFAULT_SRC )
 				usage();
@@ -180,39 +175,23 @@ class Main {
 			dependencies.push( DEPENDENCY_URI_REG.matched(1) );
 			tmp = DEPENDENCY_URI_REG.matchedRight();
 		}
-		// var doc = try Xml.parse(rawTpl) catch(e) { error("HTML template parsing failed: "+e); null; }
-		// var html = new haxe.xml.Access(doc);
-		// var fileUriReg = ~/^(.*?)(\?|$)/gi;
-		// iterateHtml(html, n->{
-		// 	switch n.name {
-		// 		case "link":
-		// 			if( n.has.href ) {
-		// 				fileUriReg.match(n.att.href);
-		// 				dependencies.push({ dir:tplDir, file:fileUriReg.matched(1) });
-		// 			}
-
-		// 		case "img":
-		// 			if( n.has.src ) {
-		// 				fileUriReg.match(n.att.src);
-		// 				dependencies.push({ dir:tplDir, file:fileUriReg.matched(1) });
-		// 			}
-
-		// 		case _:
-		// 	}
-		// });
-
 
 		// Copy dependencies
 		verbose('Copying template dependencies (${dependencies.length})...');
 		for( f in dependencies ) {
+			var to = dn.FilePath.fromFile( outputHtmlFile.directory+"/"+f );
+
+			// Try to guess if it's a template file or one near the presskit source file
 			var from = dn.FilePath.cleanUp( tplDir+"/"+f, true );
 			if( !sys.FileSystem.exists(from) ) {
 				from = dn.FilePath.cleanUp( srcFp.directory+"/"+f, true );
-				if( !sys.FileSystem.exists(from) )
+				if( !sys.FileSystem.exists(from) ) {
+					warning('Skipped dependency (not found): $from');
 					continue;
+				}
 			}
-			
-			var to = dn.FilePath.fromFile( outputHtmlFile.directory+"/"+f );
+
+			// Copy
 			sys.FileSystem.createDirectory(to.directory);
 			verbose(' -> $from => ${to.full}...');
 			sys.io.File.copy(from, to.full);
