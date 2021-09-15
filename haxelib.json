@@ -3,10 +3,10 @@
   "url" : "https://github.com/deepnight/presskit",
   "license": "Apache",
   "tags": ["presskit","press"],
-  "description": "A simple lib to turn a JSON to a static presskit HTML page. Easy to extend and adapt to your own needs, without having to modify the source code or the lib!",
-  "version": "0.1.0",
+  "description": "A simple lib to turn a XML or JSON to a static presskit HTML page. Super easy to extend and adapt to your own needs, without having to modify the source code!",
+  "version": "0.1.1",
   "classPath": "src/",
-  "releasenote": "Initial release",
+  "releasenote": "Minor description fix",
   "contributors": ["sbenard"],
   "dependencies": {}
 }
