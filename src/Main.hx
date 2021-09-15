@@ -6,6 +6,7 @@ class Main {
 	static var VERBOSE = false;
 	static var LIST_REG = ~/^([ \t]*?)-\s+(.+?)$/gi;
 	static var VAR_REG = ~/%([a-z0-9_]+)%/gi;
+	static var DEPENDENCY_URI_REG = ~/["']([^"']*?(\.png|\.gif|\.jpeg|\.jpg|\.avi|\.mpg|\.mpeg|\.css))\??.*?["']/mi;
 
 	static function main() {
 		haxe.Log.trace = function(m, ?pos) {
@@ -22,24 +23,38 @@ class Main {
 		var args = new dn.Args(
 			Sys.args().join(" "),
 			[]
-			// [ "-tpl" => 1 ]
 		);
-		var projectDir = args.getLastSoloValue();
-		var haxelibDir = Sys.getCwd();
-		var tplDir = haxelibDir+"/tpl";
+
+		// Init dirs
+		var haxelibDir = dn.FilePath.cleanUp( Sys.getCwd(), false );
+		var tplDir = dn.FilePath.cleanUp( haxelibDir+"/tpl", false );
+		var projectDir = dn.FilePath.cleanUp( args.getLastSoloValue(), false );
+
+		// Init file paths
+		var relSrcPath = args.getFirstSoloValue();
+		if( args.getAllSoloValues().length==1 )
+			relSrcPath = DEFAULT_SRC;
+		var srcFp = dn.FilePath.fromFile(projectDir+"/"+relSrcPath);
+
+		var outputHtmlFile = srcFp.clone();
+		outputHtmlFile.appendDirectory("output");
+		outputHtmlFile.fileName = srcFp.fileName;
+		outputHtmlFile.extension = "html";
+		trace(outputHtmlFile);
+
 
 		// Inits
 		var srcKeys : Map<String,String> = new Map();
 		VERBOSE = args.hasArg("-v");
 
 		// Read source file
-		var srcPath = args.getFirstSoloValue();
-		if( args.getAllSoloValues().length==1 )
-			srcPath = DEFAULT_SRC;
-		var srcFp = dn.FilePath.fromFile(projectDir+"/"+srcPath);
+		// var srcPath = args.getFirstSoloValue();
+		// if( args.getAllSoloValues().length==1 )
+		// 	srcPath = DEFAULT_SRC;
+		// var srcFp = dn.FilePath.fromFile(projectDir+"/"+srcPath);
 		verbose('Reading source file: ${srcFp.full}...');
 		if( !sys.FileSystem.exists(srcFp.full) ) {
-			if( srcPath==DEFAULT_SRC )
+			if( relSrcPath==DEFAULT_SRC )
 				usage();
 			else
 				error('File not found: ${srcFp.full}', true);
@@ -62,30 +77,6 @@ class Main {
 		var tplPath = dn.FilePath.cleanUp( tplDir+"/default.html", true );
 		verbose('Reading HTML template: $tplPath...');
 		var rawTpl = try sys.io.File.getContent(tplPath) catch(_) { error('Could not open: $tplPath'); null; }
-
-
-		// List template dependencies (CSS etc.)
-		var tplDependencies = [];
-		var doc = try Xml.parse(rawTpl) catch(e) { error("Final HTML parsing failed: "+e); null; }
-		var html = new haxe.xml.Access(doc);
-		var fileUriReg = ~/^(.*?)(\?|$)/gi;
-		iterateHtml(html, n->{
-			switch n.name {
-				case "link":
-					if( n.has.href ) {
-						fileUriReg.match(n.att.href);
-						tplDependencies.push( fileUriReg.matched(1) );
-					}
-
-				case "img":
-					if( n.has.src ) {
-						fileUriReg.match(n.att.src);
-						tplDependencies.push( fileUriReg.matched(1) );
-					}
-
-				case _:
-			}
-		});
 
 
 		// List HTML keys
@@ -173,21 +164,58 @@ class Main {
 			htmlOut = StringTools.replace(htmlOut, "%"+jk.key+"%", html);
 		}
 
-		// Save HTML
-		var tplOutPath = dn.FilePath.fromFile(srcFp.full);
-		tplOutPath.extension = "html";
-		verbose('Saving HTML: ${tplOutPath.full}...');
-		sys.io.File.saveContent(tplOutPath.full, htmlOut);
-		if( !VERBOSE )
-			Lib.println('Saved: ${tplOutPath.full}');
 
-		// Copy template depencies
-		verbose('Copying template dependencies (${tplDependencies.length})...');
-		for( f in tplDependencies ) {
+		// Save HTML
+		verbose('Saving HTML: ${outputHtmlFile.full}...');
+		sys.FileSystem.createDirectory(outputHtmlFile.directory);
+		sys.io.File.saveContent(outputHtmlFile.full, htmlOut);
+		if( !VERBOSE )
+			Lib.println('Saved: ${outputHtmlFile.full}');
+
+
+		// List template dependencies (CSS, images etc.)
+		var dependencies = [];
+		var tmp = htmlOut;
+		while( DEPENDENCY_URI_REG.match(tmp) ) {
+			dependencies.push( DEPENDENCY_URI_REG.matched(1) );
+			tmp = DEPENDENCY_URI_REG.matchedRight();
+		}
+		// var doc = try Xml.parse(rawTpl) catch(e) { error("HTML template parsing failed: "+e); null; }
+		// var html = new haxe.xml.Access(doc);
+		// var fileUriReg = ~/^(.*?)(\?|$)/gi;
+		// iterateHtml(html, n->{
+		// 	switch n.name {
+		// 		case "link":
+		// 			if( n.has.href ) {
+		// 				fileUriReg.match(n.att.href);
+		// 				dependencies.push({ dir:tplDir, file:fileUriReg.matched(1) });
+		// 			}
+
+		// 		case "img":
+		// 			if( n.has.src ) {
+		// 				fileUriReg.match(n.att.src);
+		// 				dependencies.push({ dir:tplDir, file:fileUriReg.matched(1) });
+		// 			}
+
+		// 		case _:
+		// 	}
+		// });
+
+
+		// Copy dependencies
+		verbose('Copying template dependencies (${dependencies.length})...');
+		for( f in dependencies ) {
 			var from = dn.FilePath.cleanUp( tplDir+"/"+f, true );
-			var to = dn.FilePath.cleanUp( tplOutPath.directory+"/"+f, true );
-			verbose(' -> $from => $to...');
-			sys.io.File.copy(from,to);
+			if( !sys.FileSystem.exists(from) ) {
+				from = dn.FilePath.cleanUp( srcFp.directory+"/"+f, true );
+				if( !sys.FileSystem.exists(from) )
+					continue;
+			}
+			
+			var to = dn.FilePath.fromFile( outputHtmlFile.directory+"/"+f );
+			sys.FileSystem.createDirectory(to.directory);
+			verbose(' -> $from => ${to.full}...');
+			sys.io.File.copy(from, to.full);
 		}
 
 		Lib.println("Done.");
