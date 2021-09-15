@@ -2,6 +2,7 @@ import neko.Lib;
 
 class Main {
 	static var DEFAULT_SRC = "presskit.xml";
+	static var DEFAULT_TPL = "tpl/default.html";
 	static var DEFAULT_OUTPUT = "presskit";
 	static var VERBOSE = false;
 	static var LIST_REG = ~/^([ \t]*?)-\s+(.+?)$/gi;
@@ -24,17 +25,27 @@ class Main {
 			Sys.args().join(" "),
 			[]
 		);
+		VERBOSE = args.hasArg("-v");
+
+		var argSrc : Null<String> = null;
+		var argTpl : Null<String> = null;
+
+		for( a in args.getAllSoloValues() ) {
+			if( a.toLowerCase().indexOf(".xml")>=0 )
+				argSrc = dn.FilePath.cleanUp(a,true);
+			else if( a.toLowerCase().indexOf(".json")>=0 )
+				argSrc = dn.FilePath.cleanUp(a,true);
+			else if( a.toLowerCase().indexOf(".html")>=0 )
+				argTpl = dn.FilePath.cleanUp(a,true);
+		}
 
 		// Init dirs
 		var haxelibDir = dn.FilePath.cleanUp( Sys.getCwd(), false );
-		var tplDir = dn.FilePath.cleanUp( haxelibDir+"/tpl", false );
+		var tplFp = dn.FilePath.fromFile( argTpl!=null ? argTpl : haxelibDir +"/"+ DEFAULT_TPL);
 		var projectDir = dn.FilePath.cleanUp( args.getLastSoloValue(), false );
-
-		// Init file paths
-		var relSrcPath = args.getFirstSoloValue();
-		if( args.getAllSoloValues().length==1 )
-			relSrcPath = DEFAULT_SRC;
-		var srcFp = dn.FilePath.fromFile(projectDir+"/"+relSrcPath);
+		var srcFp = dn.FilePath.fromFile( argSrc!=null ? argSrc : projectDir+"/"+DEFAULT_SRC );
+		verbose('Template: $tplFp');
+		verbose('Source: $srcFp');
 
 		var outputHtmlFile = srcFp.clone();
 		outputHtmlFile.appendDirectory("output");
@@ -44,12 +55,12 @@ class Main {
 
 		// Inits
 		var srcKeys : Map<String,String> = new Map();
-		VERBOSE = args.hasArg("-v");
+		var tplKeys : Map<String,String> = new Map();
 
 		// Read source file
 		Lib.println('Reading source file: ${srcFp.full}...');
 		if( !sys.FileSystem.exists(srcFp.full) ) {
-			if( relSrcPath==DEFAULT_SRC )
+			if( argSrc==null )
 				usage();
 			else
 				error('File not found: ${srcFp.full}', true);
@@ -69,13 +80,11 @@ class Main {
 		}
 
 		// Parse HTML template
-		var tplPath = dn.FilePath.cleanUp( tplDir+"/default.html", true );
-		verbose('Reading HTML template: $tplPath...');
-		var rawTpl = try sys.io.File.getContent(tplPath) catch(_) { error('Could not open: $tplPath'); null; }
+		verbose('Reading HTML template: ${tplFp.full}}...');
+		var rawTpl = try sys.io.File.getContent(tplFp.full) catch(_) { error('Could not open: ${tplFp.full}'); null; }
 
 
 		// List HTML keys
-		var tplKeys : Map<String,String> = new Map();
 		var keysReg = ~/%([a-z_ ]+[0-9]*)%/im;
 		var tmp = rawTpl;
 		while( keysReg.match(tmp) ) {
@@ -187,7 +196,7 @@ class Main {
 			var to = dn.FilePath.fromFile( outputHtmlFile.directory+"/"+f );
 
 			// Try to guess if it's a template file or one near the presskit source file
-			var from = dn.FilePath.cleanUp( tplDir+"/"+f, true );
+			var from = dn.FilePath.cleanUp( tplFp.directory+"/"+f, true );
 			if( !sys.FileSystem.exists(from) ) {
 				from = dn.FilePath.cleanUp( srcFp.directory+"/"+f, true );
 				if( !sys.FileSystem.exists(from) ) {
@@ -363,53 +372,17 @@ class Main {
 
 
 
-	// static function hasParameter(id:String) {
-	// 	for( p in Sys.args() )
-	// 		if( p==id )
-	// 			return true;
-	// 	return false;
-	// }
-
-	// static function getParameter(id:String) : Null<String> {
-	// 	var isNext = false;
-	// 	for( p in Sys.args() )
-	// 		if( p==id )
-	// 			isNext = true;
-	// 		else if( isNext )
-	// 			return p;
-
-	// 	return null;
-	// }
-
-	// static function getIsolatedParameters() : Array<String> {
-	// 	var all = [];
-	// 	var ignoreNext = false;
-	// 	for( p in Sys.args() ) {
-	// 		if( p.charAt(0)=="-" ) {
-	// 			if( !SINGLE_PARAMETERS.exists(p) )
-	// 				ignoreNext = true;
-	// 		}
-	// 		else if( !ignoreNext )
-	// 			all.push(p);
-	// 		else
-	// 			ignoreNext = false;
-	// 	}
-
-	// 	return all;
-	// }
-
-
 	static function usage(exitCode=0) {
 		Lib.println("");
 
 		if( exitCode==0 ) {
 			Lib.println("USAGE:");
-			Lib.println("  haxelib run presskit [<presskit_file>] [-v]");
+			Lib.println("  haxelib run presskit [<presskit_file>] [<html_template>] [-v]");
 			// Lib.println("  haxelib run presskit [presskit_file] [-o <target_dir>");
 			Lib.println("");
 			Lib.println("ARGUMENTS:");
 			Lib.println('  <presskit_file>: optional path to your presskit XML or JSON (default is "./$DEFAULT_SRC")');
-			// Lib.println('  -o <target_dir>: change the default redistHelper output dir (default "./$DEFAULT_OUTPUT/")');
+			Lib.println('  <html_template>: optional path to your own custom HTML template (default is "./$DEFAULT_TPL", from the Presskit lib folder)');
 			Lib.println('  -v: enable Verbose mode');
 			Lib.println("");
 			Lib.println('NOTES:');
@@ -422,6 +395,7 @@ class Main {
 		Lib.println("");
 		Sys.exit(exitCode);
 	}
+
 
 	static function warning(msg:Dynamic) {
 		Lib.println(" -> WARNING: "+Std.string(msg));
