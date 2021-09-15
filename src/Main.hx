@@ -83,6 +83,11 @@ class Main {
 			tplKeys.set(key,key);
 			tmp = keysReg.matchedRight();
 		}
+		if( VERBOSE ) {
+			var n = 0;
+			for(k in tplKeys) n++;
+			verbose(' -> Found $n keys in HTML template.');
+		}
 
 		// Check missing JSON keys
 		for( tplKey in tplKeys.keys() )
@@ -192,8 +197,8 @@ class Main {
 			}
 
 			// Copy
+			verbose(' -> $from ...');
 			sys.FileSystem.createDirectory(to.directory);
-			verbose(' -> $from => ${to.full}...');
 			sys.io.File.copy(from, to.full);
 		}
 
