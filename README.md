@@ -45,9 +45,9 @@ In your HTML template, you may refer to any XML/JSON entry by just using its `%n
 
 You can see a live example here:
 
-## Example 
-
 https://deepnight.net/files/presskit/nuclearBlaze/
+
+## Example 
 
 A typical XML file looks like:
 ```xml
