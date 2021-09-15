@@ -6,6 +6,12 @@ Presskit is a simple Haxe library that generates static HTML presskits from eith
  - Everything can be customized.
  - Basic **Markdown** is supported: **bold**, *italic*, ~~striked~~, [links](#nope), lists and nested lists.
 
+## Live demo
+
+You can see an example of a generated presskit here:
+
+https://deepnight.net/files/presskit/nuclearBlaze/
+
 
 ## Install
 
@@ -40,12 +46,6 @@ The XML/JSON is parsed and every entry found in it is given a unique name.
 ```
 
 In your HTML template, you may refer to any XML/JSON entry by just using its `%name%`, for example, `%game_title%` or `%company_url%`.
-
-## Live demo
-
-You can see a live example here:
-
-https://deepnight.net/files/presskit/nuclearBlaze/
 
 ## Example 
 
