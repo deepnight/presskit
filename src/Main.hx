@@ -168,10 +168,7 @@ class Main {
 			else
 				html = formatLine(html);
 
-			// Optional parent wrapper
-			// if( wrapTag!=null )
-			// 	html = '<$wrapTag>$html</$wrapTag>';
-
+			// Replace variables
 			htmlOut = StringTools.replace(htmlOut, "%"+jk.key+"%", html);
 		}
 
