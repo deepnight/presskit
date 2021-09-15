@@ -122,32 +122,22 @@ class Main {
 					var inserts = [];
 					var curWraps = [];
 					function _wrapList(idx:Int, depth:Int) {
-						trace('wrap at $idx, depth=$depth');
 						if( curWraps.length==0 && depth<0 )
 							return;
 						else if( curWraps.length==0 || curWraps[curWraps.length-1].depth < depth ) {
 							curWraps.push({ idx:idx, depth:depth });
-							trace("START "+curWraps);
 						}
 						else if( curWraps[curWraps.length-1].depth > depth ) {
 							// Close last
-							trace("CLOSE "+curWraps);
 							var startIdx = curWraps.pop().idx;
-							// if( curWraps.length>0 ) {
-							// 	inserts.push({ idx:startIdx, str:'<li><ul>' });
-							// 	inserts.push({ idx:idx, str:'</ul></li>' });
-							// }
-							// else {
-								inserts.push({ idx:startIdx, str:'<ul>' });
-								inserts.push({ idx:idx, str:'</ul>' });
-							// }
+							inserts.push({ idx:startIdx, str:'<ul>' });
+							inserts.push({ idx:idx, str:'</ul>' });
 						}
 					}
 
 
 					for( i in 0...lines.length ) {
 						var line = lines[i];
-						trace(line);
 						if( LIST_REG.match(line) ) {
 							// List element
 							_wrapList(i, LIST_REG.matched(1).length);
@@ -168,7 +158,6 @@ class Main {
 					inserts.sort( (a,b)->return -Reflect.compare(a.idx, b.idx) );
 					for(i in inserts)
 						lines.insert(i.idx, i.str);
-					trace(inserts);
 
 					html = lines.join("\n");
 

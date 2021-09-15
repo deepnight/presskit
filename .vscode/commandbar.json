@@ -31,7 +31,7 @@
       {
         "text": "Run JSON",
         "color": "cyan",
-        "command": "haxelib run presskit demo/json_demo.json -v",
+        "command": "haxelib run presskit demo/json_demo.json -v  &&  start demo\\json_demo.html",
         "alignment": "right",
         "skipTerminateQuickPick": false,
         "priority": 2
