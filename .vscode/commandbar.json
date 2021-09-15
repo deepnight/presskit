@@ -23,7 +23,7 @@
       {
         "text": "Run XML",
         "color": "cyan",
-        "command": "haxelib run presskit demo/xml_demo.xml -o presskit.html -v",
+        "command": "haxelib run presskit demo/xml_demo.xml -v  &&  start demo\\xml_demo.html",
         "alignment": "right",
         "skipTerminateQuickPick": false,
         "priority": 3
