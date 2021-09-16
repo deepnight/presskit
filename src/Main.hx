@@ -3,7 +3,6 @@ import neko.Lib;
 class Main {
 	static var DEFAULT_SRC = "presskit.xml";
 	static var DEFAULT_TPL = "tpl/default.html";
-	static var DEFAULT_OUTPUT = "presskit";
 	static var VERBOSE = false;
 	static var LIST_REG = ~/^([ \t]*?)-\s+(.+?)$/gi;
 	static var VAR_REG = ~/%([a-z0-9_]+)%/gi;
@@ -26,6 +25,7 @@ class Main {
 			[]
 		);
 		VERBOSE = args.hasArg("-v");
+		var zipping = args.hasArg("-zip");
 
 		var argSrc : Null<String> = null;
 		var argTpl : Null<String> = null;
@@ -46,10 +46,18 @@ class Main {
 		var srcFp = dn.FilePath.fromFile( argSrc!=null ? projectDir+"/"+argSrc : projectDir+"/"+DEFAULT_SRC );
 
 		var outputHtmlFile = srcFp.clone();
-		outputHtmlFile.appendDirectory("output");
+		outputHtmlFile.appendDirectory(srcFp.fileName);
 		outputHtmlFile.fileName = srcFp.fileName;
 		outputHtmlFile.extension = "html";
 
+		var zipFp = outputHtmlFile.clone();
+		zipFp.extension = "zip";
+
+		// Cleanup previous dir
+		if( sys.FileSystem.exists(outputHtmlFile.directory) ) {
+			verbose('Removing previous output dir: ${outputHtmlFile.directory}');
+			dn.FileTools.deleteDirectoryRec(outputHtmlFile.directory);
+		}
 
 		// Inits
 		var srcKeys : Map<String,String> = new Map();
@@ -81,6 +89,10 @@ class Main {
 			case _:
 				error("Unsupported source file extension: "+srcFp.extension);
 		}
+
+		if( zipping )
+			srcKeys.set("zip_path", zipFp.fileWithExt);
+		srcKeys.set("zip_status", zipping ? "on" : "off");
 
 
 		// Parse HTML template
@@ -213,6 +225,14 @@ class Main {
 			verbose(' -> $from ...');
 			sys.FileSystem.createDirectory(to.directory);
 			sys.io.File.copy(from, to.full);
+		}
+
+
+		// Zipping
+		if( zipping ) {
+			Lib.println("Zipping: ");
+			dn.FileTools.zipFolder(zipFp.full, outputHtmlFile.directory, (f,s)->Lib.print("*"));
+			Lib.println(" -> Ok");
 		}
 
 		Lib.println("Done.");

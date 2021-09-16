@@ -8,6 +8,7 @@ body {
  LAYOUT
 **************************************/
 .presskit {
+  position: relative;
   display: grid;
   grid-template-columns: 14em auto;
   grid-template-rows: 0fr 1fr;
@@ -60,6 +61,31 @@ body {
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+.presskit a.zip.off {
+  display: none;
+}
+
+.presskit a.zip.on {
+  display: block;
+  position: absolute;
+  top: 2.3rem;
+  right: 0;
+  padding: 4px 10px;
+  color: rgba(0, 0, 0, 0.6);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  opacity: 0.8;
+}
+
+.presskit a.zip.on:hover {
+  text-decoration: none;
+  opacity: 1;
+  border-color: black;
 }
 
 .presskit ul li + li {
@@ -138,6 +164,12 @@ body {
   }
   .presskit .block {
     grid-column: 1/2;
+  }
+  .presskit a.zip.on {
+    right: 16px;
+  }
+  .presskit a.zip.on .optional {
+    display: none;
   }
   .presskit .images ul {
     grid-template-columns: auto;
