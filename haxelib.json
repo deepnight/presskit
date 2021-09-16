@@ -4,9 +4,9 @@
   "license": "Apache",
   "tags": ["presskit","press"],
   "description": "A simple lib to turn a XML or JSON to a static presskit HTML page. Super easy to extend and adapt to your own needs, without having to modify the source code!",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "classPath": "src/",
-  "releasenote": "Minor description fix",
+  "releasenote": "Added -zip support. Fixed mobile responsive design.",
   "contributors": ["sbenard"],
   "dependencies": {}
 }
