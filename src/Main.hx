@@ -407,6 +407,7 @@ class Main {
 			Lib.println("ARGUMENTS:");
 			Lib.println('  <presskit_file>: optional path to your presskit XML or JSON (default is "./$DEFAULT_SRC")');
 			Lib.println('  <html_template>: optional path to your own custom HTML template (default is "./$DEFAULT_TPL", from the Presskit lib folder)');
+			Lib.println('  -zip: create a ZIP archive (and a link to it in the template if it supports that. See default template for an example)');
 			Lib.println('  -v: enable Verbose mode');
 			Lib.println("");
 			Lib.println('NOTES:');
