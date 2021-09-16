@@ -230,7 +230,7 @@ class Main {
 
 		// Zipping
 		if( zipping ) {
-			Lib.println("Zipping: ");
+			Lib.print("Zipping: ");
 			dn.FileTools.zipFolder(zipFp.full, outputHtmlFile.directory, (f,s)->Lib.print("*"));
 			Lib.println(" -> Ok");
 		}
