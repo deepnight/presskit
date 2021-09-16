@@ -11,7 +11,7 @@ body {
   display: grid;
   grid-template-columns: 14em auto;
   grid-template-rows: 0fr 1fr;
-  max-width: 900px;
+  max-width: 920px;
   margin: auto;
   padding-bottom: 4rem;
 }
@@ -122,4 +122,24 @@ body {
 
 .presskit .images ul a {
   font-size: 0;
+}
+
+/**************************************
+ MOBILE
+**************************************/
+@media only screen and (max-width: 920px) {
+  .presskit {
+    grid-template-columns: auto;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .presskit menu.main {
+    display: none;
+  }
+  .presskit .block {
+    grid-column: 1/2;
+  }
+  .presskit .images ul {
+    grid-template-columns: auto;
+  }
 }
