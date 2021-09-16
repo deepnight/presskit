@@ -235,6 +235,12 @@ class Main {
 			Lib.println(" -> Ok");
 		}
 
+
+		// Create HTaccess
+		var htaccessFp = outputHtmlFile.clone();
+		htaccessFp.fileWithExt = ".htaccess";
+		sys.io.File.saveContent(htaccessFp.full, "DirectoryIndex "+outputHtmlFile.fileWithExt);
+
 		Lib.println("Done.");
 	}
 
