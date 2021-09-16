@@ -22,6 +22,8 @@ Install the lib:
 haxelib install presskit
 ```
 
+## Usage
+
 Run it in your project folder:
 ```
 haxelib run presskit
@@ -29,6 +31,10 @@ haxelib run presskit docs/myPresskit.xml
 haxelib run presskit docs/myPresskit.json docs/myTemplate.html
 ```
 
+You may use one the following optional arguments:
+
+ - `-zip`: create a ZIP archive of the generated presskit, and add a link to grab it on the HTML page, if the template you use supports that (see [default template](tpl/default.html) for an example).
+ - `-v`: print extra informations (verbose mode)
 
 ## How does it work?
 
@@ -47,7 +53,7 @@ The XML/JSON is parsed and every entry found in it is given a unique name.
 
 In your HTML template, you may refer to any XML/JSON entry by just using its `%name%`, for example, `%game_title%` or `%company_url%`.
 
-## Example 
+## Example
 
 A typical XML file looks like:
 ```xml
