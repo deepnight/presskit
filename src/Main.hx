@@ -56,7 +56,7 @@ class Main {
 		// Cleanup previous dir
 		if( sys.FileSystem.exists(outputHtmlFile.directory) ) {
 			verbose('Removing previous output dir: ${outputHtmlFile.directory}');
-			dn.FileTools.deleteDirectoryRec(outputHtmlFile.directory);
+			retryIfFail( dn.FileTools.deleteDirectoryRec.bind(outputHtmlFile.directory) );
 		}
 
 		// Inits
@@ -242,6 +242,20 @@ class Main {
 		sys.io.File.saveContent(htaccessFp.full, "DirectoryIndex "+outputHtmlFile.fileWithExt);
 
 		Lib.println("Done.");
+	}
+
+
+	static function retryIfFail( cb:Void->Void, maxTries=5 ) {
+		var t = 1;
+		try cb()
+		catch(e) {
+			if( maxTries<=0 )
+				throw e;
+			Lib.println(' > Failed, retrying in ${t}s...');
+			var l = new sys.thread.Lock();
+			l.wait(t);
+			retryIfFail(cb, maxTries-1);
+		}
 	}
 
 	static function simpleTag(str:String, tag:String, htmlOpen:String, ?htmlClose:String) {
