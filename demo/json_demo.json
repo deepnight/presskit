@@ -2,7 +2,6 @@
 	"gameTitle" : "Nuclear Blaze SCP",
 	"author" : "<a href='https://deepnight.net'>deepnight</a>",
 	"game" : {
-		"url": "https://deepnight.net",
 		"release": 2021,
 
 		"pitch" : [
@@ -18,5 +17,14 @@
 	},
 	"company" : {
 		"name": "[Deepnight Games](https://deepnight.net)"
-	}
+	},
+	"contact": [
+		"[Developer](mailto:nope@nope.nope)",
+		"[Press inquiries](mailto:nope@nope.nope)",
+		"[Discord](https://discord.com)"
+	],
+	"links": [
+		"[Website](https://deepnight.net)",
+		"[Steam store page](https://store.steampowered.com/app/1662480/Nuclear_Blaze/)"
+	]
 }

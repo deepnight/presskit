@@ -1,9 +1,6 @@
 <game>
-	<title> Nuclear Blaze </title>
 
-	<url>
-		[Steam](https://store.steampowered.com/app/1662480/Nuclear_Blaze/)
-	</url>
+	<title> Nuclear Blaze </title>
 
 	<platforms>
 		[PC](https://store.steampowered.com/app/1662480/Nuclear_Blaze/)
@@ -46,6 +43,16 @@
 
 <company>
 	<name> [Deepnight Games](https://deepnight.net) </name>
-	<url> [deepnight.net](https://deepnight.net) </url>
 
 </company>
+
+<contact>
+	[Deepnight Games](mailto:nope@nope.nope)
+	[Press inquiries](mailto:nope@nope.nope)
+	[Discord](https://discord.com)
+</contact>
+
+<links>
+	[Steam page](https://store.steampowered.com/app/1662480/Nuclear_Blaze/)
+	[Deepnight Games](https://deepnight.net)
+</links>
