@@ -161,9 +161,12 @@ class Main {
 				}
 			}
 
+			verbose('Building XML...');
 			var out = Xml.createDocument();
 			for( k in tplKeys.keys() )
 				_recXmlBuild(out, k);
+
+			verbose('Saving XML: ${srcFp.full}');
 			sys.io.File.saveContent(srcFp.full, haxe.xml.Printer.print(out, true));
 		}
 		else {
