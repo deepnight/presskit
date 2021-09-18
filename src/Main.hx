@@ -110,7 +110,6 @@ class Main {
 		var tmp = rawTpl;
 		while( keysReg.match(tmp) ) {
 			var key = keysReg.matched(1);
-			trace(key);
 			switch key {
 				case "zip_status", "zip_path":
 					// Reserved: ignore
@@ -134,7 +133,6 @@ class Main {
 				if( subKeyReg.match(keyName) ) {
 					// Found a key with child(ren)
 					var firstName = subKeyReg.matched(1);
-					trace('$firstName has children');
 					var n = 0;
 					var cur : Xml = null;
 					for( e in target.elementsNamed(firstName) ) {
@@ -142,14 +140,12 @@ class Main {
 						n++;
 					}
 					if( n==0) {
-						trace(" => first time we meet");
 						cur = Xml.createElement(firstName);
 						target.addChild( cur );
 					}
 
 
 					var remain = subKeyReg.matched(2);
-					trace(" => remain="+remain);
 					if( subKeyReg.match(remain) ) {
 						// Contains more sub keys
 						_recXmlBuild(cur,remain);
@@ -161,18 +157,13 @@ class Main {
 				}
 				else {
 					// Key without child
-					trace('$keyName single');
 					target.addChild( Xml.createElement(keyName) );
 				}
 			}
 
 			var out = Xml.createDocument();
-			for( k in tplKeys.keys() ) {
+			for( k in tplKeys.keys() )
 				_recXmlBuild(out, k);
-				// if( !r.match(k) )
-				// 	error('Invalid key %$k% in ${tplFp.fileWithExt}');
-				// out.addChild( Xml.createElement(k) );
-			}
 			sys.io.File.saveContent(srcFp.full, haxe.xml.Printer.print(out, true));
 		}
 		else {
