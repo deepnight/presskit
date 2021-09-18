@@ -39,7 +39,7 @@
       {
         "text": "Extract XML",
         "color": "white",
-        "command": "haxelib run presskit -extract -v --force tpl/default.html test.xml",
+        "command": "haxelib run presskit -extract -v --force tpl/default.html extractTest.xml",
         "alignment": "right",
         "skipTerminateQuickPick": false,
         "priority": 1
