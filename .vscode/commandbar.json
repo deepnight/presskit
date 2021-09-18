@@ -37,6 +37,14 @@
         "priority": 2
       },
       {
+        "text": "Extract XML",
+        "color": "white",
+        "command": "haxelib run presskit -extract -v --force tpl/default.html test.xml",
+        "alignment": "right",
+        "skipTerminateQuickPick": false,
+        "priority": 1
+      },
+      {
         "text": "➠ Submit to haxelib",
         "color": "yellow",
         "command": "start haxelib submit .",

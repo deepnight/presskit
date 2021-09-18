@@ -1,12 +1,24 @@
 import neko.Lib;
 
+typedef ExtractedKeys = {
+	var k: String;
+	var sub : Map<String,ExtractedKeys>;
+}
+
 class Main {
 	static var DEFAULT_SRC = "presskit.xml";
 	static var DEFAULT_TPL = "tpl/default.html";
-	static var VERBOSE = false;
 	static var LIST_REG = ~/^([ \t]*?)-\s+(.+?)$/gi;
 	static var VAR_REG = ~/%([a-z0-9_]+)%/gi;
 	static var DEPENDENCY_URI_REG = ~/["']([^"']*?(\.png|\.gif|\.jpeg|\.jpg|\.avi|\.mpg|\.mpeg|\.css))\??.*?["']/mi;
+
+
+	static var isVerbose = false;
+	static var zipping = false;
+	static var args : dn.Args;
+	static var srcFp : dn.FilePath;
+	static var tplFp : dn.FilePath;
+	static var zipFp : dn.FilePath;
 
 	static function main() {
 		haxe.Log.trace = function(m, ?pos) {
@@ -20,12 +32,12 @@ class Main {
 		if( Sys.args().length<=0 )
 			usage();
 
-		var args = new dn.Args(
+		args = new dn.Args(
 			Sys.args().join(" "),
 			[]
 		);
-		VERBOSE = args.hasArg("-v");
-		var zipping = args.hasArg("-zip");
+		isVerbose = args.hasArg("-v");
+		zipping = args.hasArg("-zip");
 
 		var argSrc : Null<String> = null;
 		var argTpl : Null<String> = null;
@@ -41,9 +53,141 @@ class Main {
 
 		// Init dirs
 		var haxelibDir = dn.FilePath.cleanUp( Sys.getCwd(), false );
-		var tplFp = dn.FilePath.fromFile( argTpl!=null ? argTpl : haxelibDir +"/"+ DEFAULT_TPL);
 		var projectDir = dn.FilePath.cleanUp( args.getLastSoloValue(), false );
-		var srcFp = dn.FilePath.fromFile( argSrc!=null ? projectDir+"/"+argSrc : projectDir+"/"+DEFAULT_SRC );
+		tplFp = dn.FilePath.fromFile( argTpl!=null ? argTpl : haxelibDir +"/"+ DEFAULT_TPL);
+		srcFp = dn.FilePath.fromFile( argSrc!=null ? projectDir+"/"+argSrc : projectDir+"/"+DEFAULT_SRC );
+
+		// Detect mode
+		if( args.hasArg("-extract") ) {
+			// XML extraction
+			if( !sys.FileSystem.exists(tplFp.full) )
+				error('File not found: ${tplFp.full}');
+
+			if( argSrc==null )
+				error('Missing output "source" file path (with ".xml" or ".json" extension)');
+
+			if( sys.FileSystem.exists(srcFp.full) && !args.hasArg("--force") ) {
+				warning('File already exists: ${srcFp.full}');
+				Lib.print("Overwrite (Y/N)? ");
+				var k = Sys.getChar(true);
+				switch k {
+					case "y".code:
+					case _: Sys.exit(0);
+				}
+			}
+
+			switch srcFp.extension {
+				case "xml", "json":
+				case _:
+					error('Output file extension should be either ".xml" or ".json"');
+			}
+
+			extractFromTemplate( srcFp.extension.toLowerCase()=="xml" );
+		}
+		else {
+			// HTML presskit builder
+			if( !sys.FileSystem.exists(srcFp.full) && argSrc==null )
+				usage();
+			Lib.println('Source: $srcFp');
+			Lib.println('Template: $tplFp');
+
+			buildHtml();
+		}
+	}
+
+
+	/**
+		Create an empty data source file using an existing HTML template
+	**/
+	static function extractFromTemplate(xml:Bool) {
+		// Read HTML template
+		verbose('Reading HTML template: ${tplFp.full}...');
+		var rawTpl = try sys.io.File.getContent(tplFp.full) catch(_) { error('Could not open: ${tplFp.full}'); null; }
+
+		// Extract HTML keys
+		var tplKeys : Map<String,String> = new Map();
+		var keysReg = ~/%([a-z_]+[0-9]*)%/im;
+		var tmp = rawTpl;
+		while( keysReg.match(tmp) ) {
+			var key = keysReg.matched(1);
+			trace(key);
+			switch key {
+				case "zip_status", "zip_path":
+					// Reserved: ignore
+
+				case _:
+					tplKeys.set(key,key);
+			}
+			tmp = keysReg.matchedRight();
+		}
+		if( isVerbose ) {
+			var n = 0;
+			for(k in tplKeys) n++;
+			verbose(' -> Found $n keys in HTML template.');
+		}
+
+		// Rebuild keys hierarchy
+		var subKeyReg = ~/^([a-z]+[0-9]*)_(.+$)/i;
+		if( xml ) {
+			// Build XML
+			function _recXmlBuild(target:Xml, keyName:String) {
+				if( subKeyReg.match(keyName) ) {
+					// Found a key with child(ren)
+					var firstName = subKeyReg.matched(1);
+					trace('$firstName has children');
+					var n = 0;
+					var cur : Xml = null;
+					for( e in target.elementsNamed(firstName) ) {
+						cur = e;
+						n++;
+					}
+					if( n==0) {
+						trace(" => first time we meet");
+						cur = Xml.createElement(firstName);
+						target.addChild( cur );
+					}
+
+
+					var remain = subKeyReg.matched(2);
+					trace(" => remain="+remain);
+					if( subKeyReg.match(remain) ) {
+						// Contains more sub keys
+						_recXmlBuild(cur,remain);
+					}
+					else {
+						// Last child
+						cur.addChild( Xml.createElement(remain) );
+					}
+				}
+				else {
+					// Key without child
+					trace('$keyName single');
+					target.addChild( Xml.createElement(keyName) );
+				}
+			}
+
+			var out = Xml.createDocument();
+			for( k in tplKeys.keys() ) {
+				_recXmlBuild(out, k);
+				// if( !r.match(k) )
+				// 	error('Invalid key %$k% in ${tplFp.fileWithExt}');
+				// out.addChild( Xml.createElement(k) );
+			}
+			sys.io.File.saveContent(srcFp.full, haxe.xml.Printer.print(out, true));
+		}
+		else {
+			// Build JSON
+			error("JSON not implemented yet");
+			// TODO
+		}
+	}
+
+	/**
+		Create HTML presskit using a template and a data source (XML or JSON)
+	**/
+	static function buildHtml() {
+		var srcKeys : Map<String,String> = new Map();
+		var tplKeys : Map<String,String> = new Map();
 
 		var outputHtmlFile = srcFp.clone();
 		outputHtmlFile.appendDirectory(srcFp.fileName);
@@ -58,17 +202,6 @@ class Main {
 			verbose('Removing previous output dir: ${outputHtmlFile.directory}');
 			retryIfFail( dn.FileTools.deleteDirectoryRec.bind(outputHtmlFile.directory) );
 		}
-
-		// Inits
-		var srcKeys : Map<String,String> = new Map();
-		var tplKeys : Map<String,String> = new Map();
-
-
-		// Usage?
-		if( !sys.FileSystem.exists(srcFp.full) && argSrc==null )
-			usage();
-		Lib.println('Source: $srcFp');
-		Lib.println('Template: $tplFp');
 
 
 		// Read source file
@@ -95,7 +228,7 @@ class Main {
 		srcKeys.set("zip_status", zipping ? "on" : "off");
 
 
-		// Parse HTML template
+		// Read HTML template
 		verbose('Reading HTML template: ${tplFp.full}}...');
 		var rawTpl = try sys.io.File.getContent(tplFp.full) catch(_) { error('Could not open: ${tplFp.full}'); null; }
 
@@ -108,7 +241,7 @@ class Main {
 			tplKeys.set(key,key);
 			tmp = keysReg.matchedRight();
 		}
-		if( VERBOSE ) {
+		if( isVerbose ) {
 			var n = 0;
 			for(k in tplKeys) n++;
 			verbose(' -> Found $n keys in HTML template.');
@@ -194,7 +327,7 @@ class Main {
 		verbose('Saving HTML: ${outputHtmlFile.full}...');
 		sys.FileSystem.createDirectory(outputHtmlFile.directory);
 		sys.io.File.saveContent(outputHtmlFile.full, htmlOut);
-		if( !VERBOSE )
+		if( !isVerbose )
 			Lib.println('HTML output: ${outputHtmlFile.full}');
 
 
@@ -300,7 +433,7 @@ class Main {
 		// Extract keys
 		var srcKeys : Map<String,String> = new Map();
 		iterateJson(json, srcKeys);
-		if( VERBOSE ) {
+		if( isVerbose ) {
 			var n = 0;
 			for(k in srcKeys) n++;
 			verbose(" -> Found "+n+" key(s) in JSON.");
@@ -318,7 +451,7 @@ class Main {
 		// Extract keys
 		var srcKeys : Map<String,String> = new Map();
 		iterateXml(xml, srcKeys);
-		if( VERBOSE ) {
+		if( isVerbose ) {
 			var n = 0;
 			for(k in srcKeys) n++;
 			verbose(" -> Found "+n+" key(s) in XML.");
@@ -329,7 +462,7 @@ class Main {
 
 
 	static function verbose(str:String) {
-		if( VERBOSE )
+		if( isVerbose )
 			Lib.println(str);
 	}
 
@@ -449,9 +582,9 @@ class Main {
 
 	static function error(msg:Dynamic, showUsage=false) {
 		Lib.println("");
-		Lib.println("--------------------------------------------------------------");
+		Lib.println("------------------------------------------------------------------------------");
 		Lib.println("ERROR: "+Std.string(msg));
-		Lib.println("--------------------------------------------------------------");
+		Lib.println("------------------------------------------------------------------------------");
 		if( showUsage )
 			usage(1);
 		else
