@@ -6,7 +6,6 @@ typedef ExtractedKeys = {
 }
 
 class Main {
-	static var DEFAULT_SRC = "presskit.xml";
 	static var DEFAULT_TPL = "tpl/default.html";
 	static var LIST_REG = ~/^([ \t]*?)-\s+(.+?)$/gi;
 	static var VAR_REG = ~/%([a-z0-9_]+)%/gi;
@@ -16,7 +15,7 @@ class Main {
 	static var isVerbose = false;
 	static var zipping = false;
 	static var args : dn.Args;
-	static var srcFp : dn.FilePath;
+	static var srcFp : Null<dn.FilePath>;
 	static var tplFp : dn.FilePath;
 	static var zipFp : dn.FilePath;
 
@@ -55,16 +54,22 @@ class Main {
 		var haxelibDir = dn.FilePath.cleanUp( Sys.getCwd(), false );
 		var projectDir = dn.FilePath.cleanUp( args.getLastSoloValue(), false );
 		tplFp = dn.FilePath.fromFile( argTpl!=null ? argTpl : haxelibDir +"/"+ DEFAULT_TPL);
-		srcFp = dn.FilePath.fromFile( argSrc!=null ? projectDir+"/"+argSrc : projectDir+"/"+DEFAULT_SRC );
+		srcFp = argSrc==null ? null : dn.FilePath.fromFile( projectDir+"/"+argSrc );
 
 		// Detect mode
-		if( args.hasArg("-extract") ) {
+		if( args.hasArg("-extract") || args.hasArg("-e") ) {
 			// XML extraction
-			if( !sys.FileSystem.exists(tplFp.full) )
-				error('File not found: ${tplFp.full}');
+			if( args.getAllSoloValues().length==0 )
+				usage();
+
+			if( argTpl==null )
+				error('Missing HTML file path', true);
 
 			if( argSrc==null )
-				error('Missing output "source" file path (with ".xml" or ".json" extension)');
+				error('Missing output "source" file path (with ".xml" or ".json" extension)', true);
+
+			if( !sys.FileSystem.exists(tplFp.full) )
+				error('File not found: ${tplFp.full}');
 
 			if( sys.FileSystem.exists(srcFp.full) && !args.hasArg("--force") ) {
 				warning('File already exists: ${srcFp.full}');
@@ -86,6 +91,9 @@ class Main {
 		}
 		else {
 			// HTML presskit builder
+			if( srcFp==null )
+				usage();
+
 			if( !sys.FileSystem.exists(srcFp.full) && argSrc==null )
 				usage();
 			Lib.println('Source: $srcFp');
@@ -546,23 +554,32 @@ class Main {
 	static function usage(exitCode=0) {
 		Lib.println("");
 
-		if( exitCode==0 ) {
-			Lib.println("USAGE:");
-			Lib.println("  haxelib run presskit [<presskit_file>] [<html_template>] [-v]");
-			// Lib.println("  haxelib run presskit [presskit_file] [-o <target_dir>");
+		// if( exitCode==0 ) {
+			Lib.println("NORMAL USAGE:");
+			Lib.println('  In this mode, an HTML presskit is generated using a HTML template + a source file (xml or json)');
 			Lib.println("");
-			Lib.println("ARGUMENTS:");
-			Lib.println('  <presskit_file>: optional path to your presskit XML or JSON (default is "./$DEFAULT_SRC")');
-			Lib.println('  <html_template>: optional path to your own custom HTML template (default is "./$DEFAULT_TPL", from the Presskit lib folder)');
-			Lib.println('  -zip: create a ZIP archive (and a link to it in the template if it supports that. See default template for an example)');
-			Lib.println('  -v: enable Verbose mode');
+			Lib.println("    haxelib run presskit <presskit_file> [<html_template>] [-zip] [-v]");
 			Lib.println("");
-			Lib.println('NOTES:');
-			Lib.println('  Basic markdown style formatting is supported: bold (**), italic (*), striked (~~), lists, nested lists and links ( [desc](url) ).');
+			Lib.println('  Note: basic markdown style formatting is supported in your source file: bold (**), italic (*), striked (~~), lists, nested lists and links ( [desc](url) ).');
 			Lib.println('  See "demo" folder for some examples.');
-		}
-		else
-			Lib.println("For help, just run:  haxelib run presskit");
+			Lib.println("");
+			Lib.println('    <presskit_file>: path to your presskit XML or JSON');
+			Lib.println('    <html_template>: optional path to your own custom HTML template (default is "./$DEFAULT_TPL", from the Presskit lib folder)');
+			Lib.println('    -zip: create a ZIP archive (and a link to it in the template if it supports that. See default template for an example)');
+			Lib.println('    -v: enable Verbose mode');
+
+			Lib.println('');
+			Lib.println("EXTRACTION MODE:");
+			Lib.println('  Build a XML or a JSON file using keys found in provided HTML template.');
+			Lib.println("");
+			Lib.println("    haxelib run presskit -extract <html_to_extract> <output_presskit_file.ext> [-v]");
+			Lib.println("");
+			Lib.println('    -extract (or -e): enable Extraction mode');
+			Lib.println('    <html_to_extract>: HTML file to parse and to extract keys from');
+			Lib.println('    <output_presskit_file.ext>: output presskit file to generated (with either ".xml" or ".json" extension)');
+		// }
+		// else
+		// 	Lib.println("For help, just run:  haxelib run presskit");
 
 		Lib.println("");
 		Sys.exit(exitCode);
