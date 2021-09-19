@@ -62,8 +62,8 @@ class Main {
 			if( args.getAllSoloValues().length==0 )
 				usage();
 
-			if( argTpl==null )
-				error('Missing HTML file path', true);
+			// if( argTpl==null )
+			// 	error('Missing HTML file path', true);
 
 			if( argSrc==null )
 				error('Missing output "source" file path (with ".xml" or ".json" extension)', true);
@@ -612,11 +612,15 @@ class Main {
 			Lib.println("EXTRACTION MODE:");
 			Lib.println('  Build a XML or a JSON presskit file using keys found in an existing HTML template.');
 			Lib.println("");
-			Lib.println("    haxelib run presskit -extract <html_to_extract> <output_presskit_file> [-v]");
+			Lib.println("    haxelib run presskit -extract [<html_to_extract>] <output_presskit_file> [-v]");
 			Lib.println("");
 			Lib.println('    -extract | -x: enable Extraction mode');
-			Lib.println('    <html_to_extract>: HTML file to parse and to extract keys from');
+			Lib.println('    <html_to_extract>: HTML file to parse and to extract keys from (default is "./$DEFAULT_TPL", from the Presskit lib folder)');
 			Lib.println('    <output_presskit_file>: output presskit file to generated (with either ".xml" or ".json" extension)');
+			Lib.println('');
+			Lib.println('EXAMPLES:');
+			Lib.println('    haxelib run presskit -x emptyPresskit.xml');
+			Lib.println('    haxelib run presskit emptyPresskit.xml -zip');
 		// }
 		// else
 		// 	Lib.println("For help, just run:  haxelib run presskit");
