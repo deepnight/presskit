@@ -6,7 +6,7 @@
         {
             "label": "Neko",
             "type": "hxml",
-            "file": "build.hxml",
+            "file": "build.neko.hxml",
             "presentation": {
                 "reveal": "never",
                 "panel": "dedicated",

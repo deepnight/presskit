@@ -8,5 +8,8 @@
   "classPath": "src/",
   "releasenote": "Added -zip support. Fixed mobile responsive design. Added automatic 'htaccess' generation. Added retries on directory initial cleanup.",
   "contributors": ["sbenard"],
-  "dependencies": {}
+  "dependencies": {
+    "deepnightLibs":""
+  },
+  "main": "Main"
 }

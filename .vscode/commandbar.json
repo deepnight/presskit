@@ -53,6 +53,14 @@
         "priority": 0
       },
       {
+        "text": "Build EXE",
+        "color": "yellow",
+        "command": "nekotools boot run.n",
+        "alignment": "right",
+        "skipTerminateQuickPick": false,
+        "priority": -98
+      },
+      {
         "text": "➠ Submit to haxelib",
         "color": "yellow",
         "command": "start haxelib submit .",
