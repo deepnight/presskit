@@ -233,7 +233,7 @@ class Main {
 		var tplKeys : Map<String,String> = new Map();
 
 		var outputHtmlFile = srcFp.clone();
-		outputHtmlFile.appendDirectory(srcFp.fileName);
+		outputHtmlFile.appendDirectory(srcFp.fileName+"_html");
 		outputHtmlFile.fileName = srcFp.fileName;
 		outputHtmlFile.extension = "html";
 
