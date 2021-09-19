@@ -1,18 +1,18 @@
 {
-	"game": {
-		"desc": [""],
-		"pitch": [""],
-		"release": [""],
-		"videos": [""],
-		"images": [""],
-		"title": [""],
-		"platforms": [""],
-		"features": [""],
-		"credits": [""]
-	},
-	"links": [""],
 	"company": {
 		"name": [""]
 	},
-	"contact": [""]
+	"contact": [""],
+	"game": {
+		"pitch": [""],
+		"title": [""],
+		"platforms": [""],
+		"images": [""],
+		"videos": [""],
+		"desc": [""],
+		"release": [""],
+		"features": [""],
+		"credits": [""]
+	},
+	"links": [""]
 }
