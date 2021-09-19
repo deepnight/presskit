@@ -53,9 +53,9 @@
         "priority": 0
       },
       {
-        "text": "Build EXE",
+        "text": "Redist",
         "color": "yellow",
-        "command": "nekotools boot run.n",
+        "command": "haxelib run redistHelper build.hl.hxml",
         "alignment": "right",
         "skipTerminateQuickPick": false,
         "priority": -98
