@@ -36,7 +36,7 @@ class Main {
 			Sys.args().join(" "),
 			[]
 		);
-		isVerbose = args.hasArg("-v");
+		isVerbose = args.hasArg("-v") || args.hasArg("-verbose");
 		zipping = args.hasArg("-zip");
 
 		var argSrc : Null<String> = null;
@@ -604,7 +604,7 @@ class Main {
 			Lib.println('    <xml_or_json_presskit>: path to your presskit XML or JSON');
 			Lib.println('    <html_template>: optional path to your own custom HTML template (default is "./$DEFAULT_TPL", from the Presskit lib folder)');
 			Lib.println('    -zip: create a ZIP archive (and a link to it in the template if it supports that. See default template for an example)');
-			Lib.println('    -v: enable Verbose mode');
+			Lib.println('    -verbose | -v: enable Verbose mode');
 			Lib.println("");
 			Lib.println('  Note: basic markdown style formatting is supported in your source file: bold (**), italic (*), striked (~~), lists, nested lists and links ( [desc](url) ).');
 			Lib.println('  See "demo" folder for some examples.');
