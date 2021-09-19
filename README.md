@@ -6,14 +6,12 @@ Presskit is a simple Haxe library that generates static HTML presskits from eith
  - Everything can be customized.
  - Basic **Markdown** is supported: **bold**, *italic*, ~~striked~~, [links](#nope), lists and nested lists.
 
-## Live demo
-
 You can see an example of a generated presskit here:
 
 https://deepnight.net/files/presskit/nuclearBlaze/
 
 
-## Install
+# Install
 
 You need [Haxe](https://haxe.org) to run this library.
 
@@ -22,21 +20,64 @@ Install the lib:
 haxelib install presskit
 ```
 
-## Usage
+# Usage
 
-Run it in your project folder:
+## METHOD 1 - Use the existing default HTML template
+
+Generate an empty Presskit file in your prefered format.
+
+**XML (recommended):**
 ```
-haxelib run presskit
-haxelib run presskit docs/myPresskit.xml
-haxelib run presskit docs/myPresskit.json docs/myTemplate.html
+haxelib run presskit -extract myPresskit.xml
 ```
 
-You may use one the following optional arguments:
+**JSON:**
+```
+haxelib run presskit -extract myPresskit.json
+```
+*Why is XML recommended over JSON in 2021 you might wonder? Simply because the ouput is an HTML file, and XML format is more convenient for this exact purpose.*
 
- - `-zip`: create a ZIP archive of the generated presskit, and add a link to grab it on the HTML page, if the template you use supports that (see [default template](tpl/default.html) for an example).
- - `-v`: print extra informations (verbose mode)
+Now just edit your presskit file and fill in the fields.
 
-## How does it work?
+When you're ready to generate your HTML presskit page, run the following command:
+
+```
+haxelib run presskit myPresskit.xml [-zip]
+```
+
+The optional `-zip` argument will generate a ZIP archive and add a "Download everything as ZIP" to the HTML page.
+
+## METHOD 2 - Create your own HTML template first
+
+Create some HTML file containing variables named like `%productName%`:
+
+```html
+<div class="presskit">
+	<h2>Factsheet</h2>
+	<dl>
+		<dt>Product name</dt>
+		<dd>%productName%</dd>
+
+		<dt>Developer</dt>
+		<dd>%companyName%</dd>
+	</dl>
+</div>
+```
+
+Run this command to extract all variables (eg. `%productName%`) and build a XML or JSON out of it:
+
+```xml
+<productName></productName>
+<companyName></companyName>
+```
+
+You can then fill this file, and build your HTML final presskit using:
+
+```
+haxelib run presskit myPresskitFile.xml myCustomTemplate.html
+```
+
+# How does it work?
 
 **It's super simple, and designed to be very easy to "extend", as you'll see.**
 
