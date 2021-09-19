@@ -57,7 +57,7 @@ class Main {
 		srcFp = argSrc==null ? null : dn.FilePath.fromFile( projectDir+"/"+argSrc );
 
 		// Detect mode
-		if( args.hasArg("-extract") || args.hasArg("-e") ) {
+		if( args.hasArg("-extract") || args.hasArg("-x") ) {
 			// XML extraction
 			if( args.getAllSoloValues().length==0 )
 				usage();
@@ -133,6 +133,8 @@ class Main {
 			verbose(' -> Found $n keys in HTML template.');
 		}
 
+		var outRaw : String = "";
+
 		// Rebuild keys hierarchy
 		var subKeyReg = ~/^([a-z]+[0-9]*)_(.+$)/i;
 		if( xml ) {
@@ -174,15 +176,53 @@ class Main {
 			for( k in tplKeys.keys() )
 				_recXmlBuild(out, k);
 
-			verbose('Saving XML: ${srcFp.full}');
-			sys.io.File.saveContent(srcFp.full, haxe.xml.Printer.print(out, true));
+			outRaw = haxe.xml.Printer.print(out, true);
 		}
 		else {
 			// Build JSON
-			error("JSON not implemented yet");
-			// TODO
+			function _recStructBuild(target:Dynamic, keyName:String) {
+				if( subKeyReg.match(keyName) ) {
+					// Found a key with child(ren)
+					var firstName = subKeyReg.matched(1);
+					var cur : Dynamic = null;
+					cur =
+						if( !Reflect.hasField(target,firstName) ) {
+							var o = {}
+							Reflect.setField(target, firstName, o);
+							o;
+						}
+						else
+							Reflect.field(target, firstName);
+
+					var remain = subKeyReg.matched(2);
+					if( subKeyReg.match(remain) ) {
+						// Contains more sub keys
+						_recStructBuild(cur,remain);
+					}
+					else {
+						// Last child
+						Reflect.setField(cur, remain, [""]);
+					}
+				}
+				else {
+					// Key without child
+					Reflect.setField(target, keyName, [""]);
+				}
+			}
+
+			verbose('Building JSON...');
+			var out : Dynamic = {}
+			for( k in tplKeys.keys() )
+				_recStructBuild(out, k);
+
+			// Create JSON
+			outRaw = dn.JsonPretty.stringify(out);
 		}
-	}
+
+		// Save file
+		verbose('Saving presskit ${xml?"XML":"JSON"}: ${srcFp.full}');
+		sys.io.File.saveContent(srcFp.full, outRaw);
+}
 
 	/**
 		Create HTML presskit using a template and a data source (XML or JSON)
@@ -556,27 +596,27 @@ class Main {
 
 		// if( exitCode==0 ) {
 			Lib.println("NORMAL USAGE:");
-			Lib.println('  In this mode, an HTML presskit is generated using a HTML template + a source file (xml or json)');
+			Lib.println('  In this mode, an HTML static page is generated using a HTML template + a presskit source file (xml or json)');
 			Lib.println("");
-			Lib.println("    haxelib run presskit <presskit_file> [<html_template>] [-zip] [-v]");
+			Lib.println("    haxelib run presskit <xml_or_json_presskit> [<html_template>] [-zip] [-v]");
 			Lib.println("");
-			Lib.println('  Note: basic markdown style formatting is supported in your source file: bold (**), italic (*), striked (~~), lists, nested lists and links ( [desc](url) ).');
-			Lib.println('  See "demo" folder for some examples.');
-			Lib.println("");
-			Lib.println('    <presskit_file>: path to your presskit XML or JSON');
+			Lib.println('    <xml_or_json_presskit>: path to your presskit XML or JSON');
 			Lib.println('    <html_template>: optional path to your own custom HTML template (default is "./$DEFAULT_TPL", from the Presskit lib folder)');
 			Lib.println('    -zip: create a ZIP archive (and a link to it in the template if it supports that. See default template for an example)');
 			Lib.println('    -v: enable Verbose mode');
+			Lib.println("");
+			Lib.println('  Note: basic markdown style formatting is supported in your source file: bold (**), italic (*), striked (~~), lists, nested lists and links ( [desc](url) ).');
+			Lib.println('  See "demo" folder for some examples.');
 
 			Lib.println('');
 			Lib.println("EXTRACTION MODE:");
-			Lib.println('  Build a XML or a JSON file using keys found in provided HTML template.');
+			Lib.println('  Build a XML or a JSON presskit file using keys found in an existing HTML template.');
 			Lib.println("");
-			Lib.println("    haxelib run presskit -extract <html_to_extract> <output_presskit_file.ext> [-v]");
+			Lib.println("    haxelib run presskit -extract <html_to_extract> <output_presskit_file> [-v]");
 			Lib.println("");
-			Lib.println('    -extract (or -e): enable Extraction mode');
+			Lib.println('    -extract | -x: enable Extraction mode');
 			Lib.println('    <html_to_extract>: HTML file to parse and to extract keys from');
-			Lib.println('    <output_presskit_file.ext>: output presskit file to generated (with either ".xml" or ".json" extension)');
+			Lib.println('    <output_presskit_file>: output presskit file to generated (with either ".xml" or ".json" extension)');
 		// }
 		// else
 		// 	Lib.println("For help, just run:  haxelib run presskit");

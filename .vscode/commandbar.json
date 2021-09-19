@@ -45,12 +45,20 @@
         "priority": 1
       },
       {
+        "text": "Extract JSON",
+        "color": "white",
+        "command": "haxelib run presskit -extract -v --force tpl/default.html extractTest.json",
+        "alignment": "right",
+        "skipTerminateQuickPick": false,
+        "priority": 0
+      },
+      {
         "text": "➠ Submit to haxelib",
         "color": "yellow",
         "command": "start haxelib submit .",
         "alignment": "right",
         "skipTerminateQuickPick": false,
-        "priority": 0
+        "priority": -99
       }
     ]
   }
