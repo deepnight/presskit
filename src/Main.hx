@@ -79,6 +79,8 @@ class Main {
 					case "y".code:
 					case _: Sys.exit(0);
 				}
+				Lib.println('');
+				Lib.println('');
 			}
 
 			switch srcFp.extension {
@@ -220,7 +222,7 @@ class Main {
 		}
 
 		// Save file
-		verbose('Saving presskit ${xml?"XML":"JSON"}: ${srcFp.full}');
+		Lib.println('Saving presskit ${xml?"XML":"JSON"}: ${srcFp.full}');
 		sys.io.File.saveContent(srcFp.full, outRaw);
 }
 
