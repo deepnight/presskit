@@ -49,7 +49,7 @@ The optional `-zip` argument will generate a ZIP archive and add a "Download eve
 
 ## METHOD 2 - Create your own HTML template first
 
-Create some HTML file containing variables named like `%productName%`:
+Create some HTML file containing variables named like `%productName%`. You might as well copy the existing [Default HTML template](tpl/default.html) and start from here. Don't forget to grab the CSS along with it.
 
 ```html
 <div class="presskit">
