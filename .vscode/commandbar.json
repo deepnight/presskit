@@ -39,7 +39,7 @@
       {
         "text": "Extract XML",
         "color": "white",
-        "command": "haxelib run presskit -extract -v --force tpl/default.html extractTest.xml",
+        "command": "haxelib run presskit -extract -v --force tpl/default.html demo/empty_presskit.xml",
         "alignment": "right",
         "skipTerminateQuickPick": false,
         "priority": 1
@@ -47,7 +47,7 @@
       {
         "text": "Extract JSON",
         "color": "white",
-        "command": "haxelib run presskit -extract -v --force tpl/default.html extractTest.json",
+        "command": "haxelib run presskit -extract -v --force tpl/default.html demo/empty_presskit.json",
         "alignment": "right",
         "skipTerminateQuickPick": false,
         "priority": 0
