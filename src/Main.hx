@@ -26,6 +26,7 @@ class Main {
 
 			Lib.println(Std.string(m));
 		}
+		Lib.println('');
 
 		// Arguments
 		if( Sys.args().length<=0 )
@@ -72,7 +73,7 @@ class Main {
 				error('File not found: ${tplFp.full}');
 
 			if( sys.FileSystem.exists(srcFp.full) && !args.hasArg("--force") ) {
-				warning('File already exists: ${srcFp.full}');
+				Lib.println('WARNING! File already exists and will be DELETED: ${srcFp.fileWithExt}');
 				Lib.print("Overwrite (Y/N)? ");
 				var k = Sys.getChar(true);
 				switch k {
@@ -129,11 +130,9 @@ class Main {
 			}
 			tmp = keysReg.matchedRight();
 		}
-		if( isVerbose ) {
-			var n = 0;
-			for(k in tplKeys) n++;
-			verbose(' -> Found $n keys in HTML template.');
-		}
+		var keyCount = 0;
+		for(k in tplKeys) keyCount++;
+		verbose(' -> Found $keyCount keys in HTML template.');
 
 		var outRaw : String = "";
 
@@ -222,7 +221,7 @@ class Main {
 		}
 
 		// Save file
-		Lib.println('Saving presskit ${xml?"XML":"JSON"}: ${srcFp.full}');
+		Lib.println('Saving $keyCount keys to presskit ${xml?"XML":"JSON"}: ${srcFp.full}');
 		sys.io.File.saveContent(srcFp.full, outRaw);
 }
 
