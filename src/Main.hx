@@ -505,8 +505,7 @@ class Main {
 		if( isVerbose ) {
 			var all = [];
 			for(k in keys.keys())
-				if( !isKeyNameReserved(k) )
-					all.push(k);
+				all.push(k);
 			verbose(' -> Found: ${all.join(", ")}');
 			verbose(' -> ${all.length} key(s).');
 		}
