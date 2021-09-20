@@ -224,7 +224,8 @@ class Main {
 		}
 
 		// Save file
-		Lib.println('Saving keys to presskit ${xml?"XML":"JSON"}: ${srcFp.full}');
+		var n = Lambda.count(tplKeys);
+		Lib.println('Saving $n key(s) to presskit ${xml?"XML":"JSON"}: ${srcFp.full}');
 		sys.io.File.saveContent(srcFp.full, outRaw);
 }
 
@@ -407,7 +408,7 @@ class Main {
 		if( zipping ) {
 			Lib.print("Zipping: ");
 			dn.FileTools.zipFolder(zipFp.full, outputHtmlFile.directory, (f,s)->Lib.print("*"));
-			Lib.println(" -> Ok");
+			Lib.println(' -> ${zipFp.fileWithExt}');
 		}
 
 
