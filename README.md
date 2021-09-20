@@ -11,7 +11,8 @@ You can see an example of a generated presskit here:
 https://deepnight.net/files/presskit/nuclearBlaze/
 
 
-# Install
+
+# Installation
 
 You need [Haxe](https://haxe.org) to run this library.
 
@@ -20,9 +21,11 @@ Install the lib:
 haxelib install presskit
 ```
 
+
+
 # Usage
 
-## METHOD 1 - Use the existing default HTML template
+## Method 1 - Use the existing default HTML template
 
 Generate an empty Presskit file in your prefered format.
 
@@ -49,9 +52,11 @@ The `-html` indicates to switch to HTML generation mode.
 
 The optional `-zip` argument will generate a ZIP archive and add a "Download everything as ZIP" to the HTML page.
 
-## METHOD 2 - Create your own HTML template first
+## Method 2 - Create your own HTML template first
 
-Create some HTML file containing variables named like `%productName%`. You might as well copy the existing [Default HTML template](tpl/default.html) and start from here. Don't forget to grab the CSS along with it.
+### Custom HTML template
+
+Create some HTML file containing variables named like `%productName%`. It's a good idea to start from the existing [default HTML template](tpl/default.html). Don't forget to grab the CSS along with it.
 
 ```html
 <div class="presskit">
@@ -68,10 +73,33 @@ Create some HTML file containing variables named like `%productName%`. You might
 
 Run this command to extract all variables (eg. `%productName%`) and build a XML or JSON out of it:
 
+
 ```xml
 <productName></productName>
 <companyName></companyName>
 ```
+
+### Syntax of HTML template variables
+
+Your variable names can contain `/` (slashes) to create some hierarchy in your presskit file:
+```html
+<div class="presskit">
+	<h2>%product/name%</h2>
+	<div class="desc">
+		%product/desc%
+	</div>
+</div>
+```
+
+**XML:**
+```xml
+<product>
+	<name></name>
+	<desc></desc>
+</product>
+```
+
+### Build your final HTML presskit
 
 You can then fill this file, and build your HTML final presskit using:
 
@@ -79,26 +107,26 @@ You can then fill this file, and build your HTML final presskit using:
 haxelib run presskit -html myPresskitFile.xml myCustomTemplate.html
 ```
 
-# How does it work?
 
-**It's super simple, and designed to be very easy to "extend", as you'll see.**
 
-The XML/JSON is parsed and every entry found in it is given a unique name.
+# Example
 
-```xml
-<game>
-	<title> Hello </title> <!-- Entry will be named "game_title" -->
-</game>
-<company>
-	<url> Some link </url> <!-- Entry will be named "company_url" -->
-</company>
+HTML template:
+```html
+<html lang="en">
+	<head> [...] </head>
+
+	<body>
+		<div class="presskit">
+			<h2> %game/title% (by %company/name%)</h2>
+			<div class="desc"> %game/desc% </div>
+			<div class="desc"> Website: %game/url% </div>
+		</div>
+	</body>
+</html>
 ```
 
-In your HTML template, you may refer to any XML/JSON entry by just using its `%name%`, for example, `%game_title%` or `%company_url%`.
-
-## Example
-
-A typical XML file looks like:
+Its corresponding XML:
 ```xml
 <game>
 	<title> Nuclear Blaze </title>
@@ -121,18 +149,23 @@ A typical XML file looks like:
 </company>
 ```
 
-And the corresponding HTML (simplified) template:
-```html
-<html lang="en">
-	<head> [...] </head>
+Or JSON:
+```JSON
+{
+	"game": {
+		"title": "Nuclear Blaze",
+		"url": "[Steam page](https://store.steampowered.com/app/1662480)",
+		"desc": [
+			'<img src="img/keyart.png"/>',
+			'A **unique** 2D firefighting game from the creator of **[Dead Cells](...)**, with all the devastating backdrafts, exploding walls and sprinklers you could expect.',
 
-	<body>
-		<div class="presskit">
-			<h2> %game_title% (by %company_name%)</h2>
-			<div class="desc"> %game_desc% </div>
-			<div class="desc"> Website: %game_url% </div>
-		</div>
-	</body>
-</html>
+			'- This game is cool',
+			'- Another bullet point',
+			'- And a last one'
+		]
+	},
+	"company": {
+		"name": "Deepnight Games"
+	}
+}
 ```
-
