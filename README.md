@@ -99,6 +99,11 @@ Your variable names can contain `/` (slashes) to create some hierarchy in your p
 </product>
 ```
 
+There are a few special **reserved** variable names for your template:
+
+ - `%zip/status%`: this will contain either "on" or "off", depending on the `-zip` argument being used or not. This is used to add a CSS class to the "Download ZIP" button, to either show or hide it.
+ - `%zip/path%`: relative path to the generated ZIP file.
+
 ### Build your final HTML presskit
 
 You can then fill this file, and build your HTML final presskit using:
