@@ -1,16 +1,40 @@
-<links/>
+<links>
+	todo
+</links>
 <game>
-	<videos/>
-	<title/>
-	<release/>
-	<platforms/>
-	<pitch/>
-	<images/>
-	<features/>
-	<desc/>
-	<credits/>
+	<videos>
+		todo
+	</videos>
+	<title>
+		todo
+	</title>
+	<release>
+		todo
+	</release>
+	<platforms>
+		todo
+	</platforms>
+	<pitch>
+		todo
+	</pitch>
+	<images>
+		todo
+	</images>
+	<features>
+		todo
+	</features>
+	<desc>
+		todo
+	</desc>
+	<credits>
+		todo
+	</credits>
 </game>
-<contact/>
+<contact>
+	todo
+</contact>
 <company>
-	<name/>
+	<name>
+		todo
+	</name>
 </company>

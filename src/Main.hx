@@ -7,6 +7,7 @@ typedef ExtractedKeys = {
 
 class Main {
 	static var DEFAULT_TPL = "tpl/default.html";
+	static var DEFAULT_EMPTY_VALUE = "todo";
 	static var LIST_REG = ~/^([ \t]*?)-\s+(.+?)$/gi;
 	static var VAR_REG = ~/%([a-z0-9_]+)%/gi;
 	static var DEPENDENCY_URI_REG = ~/["']([^"']*?(\.png|\.gif|\.jpeg|\.jpg|\.avi|\.mpg|\.mpeg|\.css))\??.*?["']/mi;
@@ -165,12 +166,16 @@ class Main {
 					}
 					else {
 						// Last child
-						cur.addChild( Xml.createElement(remain) );
+						var e = Xml.createElement(remain);
+						e.addChild( Xml.createPCData(DEFAULT_EMPTY_VALUE) );
+						cur.addChild(e);
 					}
 				}
 				else {
 					// Key without child
-					target.addChild( Xml.createElement(keyName) );
+					var e = Xml.createElement(keyName);
+					e.addChild( Xml.createPCData(DEFAULT_EMPTY_VALUE) );
+					target.addChild(e);
 				}
 			}
 
@@ -204,12 +209,12 @@ class Main {
 					}
 					else {
 						// Last child
-						Reflect.setField(cur, remain, [""]);
+						Reflect.setField(cur, remain, [DEFAULT_EMPTY_VALUE]);
 					}
 				}
 				else {
 					// Key without child
-					Reflect.setField(target, keyName, [""]);
+					Reflect.setField(target, keyName, [DEFAULT_EMPTY_VALUE]);
 				}
 			}
 

@@ -1,18 +1,18 @@
 {
 	"company": {
-		"name": [""]
+		"name": ["todo"]
 	},
-	"contact": [""],
+	"contact": ["todo"],
 	"game": {
-		"pitch": [""],
-		"title": [""],
-		"platforms": [""],
-		"images": [""],
-		"videos": [""],
-		"desc": [""],
-		"release": [""],
-		"features": [""],
-		"credits": [""]
+		"pitch": ["todo"],
+		"title": ["todo"],
+		"platforms": ["todo"],
+		"images": ["todo"],
+		"videos": ["todo"],
+		"desc": ["todo"],
+		"release": ["todo"],
+		"features": ["todo"],
+		"credits": ["todo"]
 	},
-	"links": [""]
+	"links": ["todo"]
 }
