@@ -120,12 +120,12 @@ class Main {
 
 		// Extract HTML keys
 		var tplKeys : Map<String,String> = new Map();
-		var keysReg = ~/%([a-z_]+[0-9]*)%/im;
+		var keysReg = ~/%([a-z_\/]+[0-9]*)%/im;
 		var tmp = rawTpl;
 		while( keysReg.match(tmp) ) {
 			var key = keysReg.matched(1);
 			switch key {
-				case "zip_status", "zip_path":
+				case "zip/status", "zip/path":
 					// Reserved: ignore
 
 				case _:
@@ -140,7 +140,7 @@ class Main {
 		var outRaw : String = "";
 
 		// Rebuild keys hierarchy
-		var subKeyReg = ~/^([a-z]+[0-9]*)_(.+$)/i;
+		var subKeyReg = ~/^([a-z]+[0-9]*)\/(.+$)/i;
 		if( xml ) {
 			// Build XML
 			function _recXmlBuild(target:Xml, keyName:String) {
@@ -274,8 +274,8 @@ class Main {
 		}
 
 		if( zipping )
-			srcKeys.set("zip_path", zipFp.fileWithExt);
-		srcKeys.set("zip_status", zipping ? "on" : "off");
+			srcKeys.set("zip/path", zipFp.fileWithExt);
+		srcKeys.set("zip/status", zipping ? "on" : "off");
 
 
 		// Read HTML template
@@ -633,6 +633,8 @@ class Main {
 			Lib.println('EXAMPLES:');
 			Lib.println('    haxelib run presskit -x emptyPresskit.xml');
 			Lib.println('    haxelib run presskit emptyPresskit.xml -zip');
+			Lib.println('');
+			Lib.println('Full manual: https://github.com/deepnight/presskit');
 		// }
 		// else
 		// 	Lib.println("For help, just run:  haxelib run presskit");
