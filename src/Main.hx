@@ -72,7 +72,7 @@ class Main {
 			if( !sys.FileSystem.exists(tplFp.full) )
 				error('File not found: ${tplFp.full}');
 
-			if( sys.FileSystem.exists(srcFp.full) && !args.hasArg("--force") ) {
+			if( sys.FileSystem.exists(srcFp.full) && !args.hasArg("-force") ) {
 				Lib.println('WARNING! File already exists and will be DELETED: ${srcFp.fileWithExt}');
 				Lib.print("Overwrite (Y/N)? ");
 				var k = Sys.getChar(true);
@@ -603,8 +603,6 @@ class Main {
 			Lib.println("");
 			Lib.println('    <xml_or_json_presskit>: path to your presskit XML or JSON');
 			Lib.println('    <html_template>: optional path to your own custom HTML template (default is "./$DEFAULT_TPL", from the Presskit lib folder)');
-			Lib.println('    -zip: create a ZIP archive (and a link to it in the template if it supports that. See default template for an example)');
-			Lib.println('    -verbose | -v: enable Verbose mode');
 			Lib.println("");
 			Lib.println('  Note: basic markdown style formatting is supported in your source file: bold (**), italic (*), striked (~~), lists, nested lists and links ( [desc](url) ).');
 			Lib.println('  See "demo" folder for some examples.');
@@ -618,6 +616,11 @@ class Main {
 			Lib.println('    -extract | -x: enable Extraction mode');
 			Lib.println('    <html_to_extract>: HTML file to parse and to extract keys from (default is "./$DEFAULT_TPL", from the Presskit lib folder)');
 			Lib.println('    <output_presskit_file>: output presskit file to generated (with either ".xml" or ".json" extension)');
+			Lib.println('');
+			Lib.println('ARGUMENTS:');
+			Lib.println('    -zip: create a ZIP archive (and a link to it in the template if it supports that. See default template for an example)');
+			Lib.println('    -force: bypass confirmations and overwrite everything');
+			Lib.println('    -verbose | -v: enable Verbose mode');
 			Lib.println('');
 			Lib.println('EXAMPLES:');
 			Lib.println('    haxelib run presskit -x emptyPresskit.xml');
