@@ -140,7 +140,6 @@ class Main {
 		if( xml ) {
 			// Build XML
 			function _recXmlBuild(target:Xml, keyName:String) {
-				trace(keyName);
 				if( subKeyReg.match(keyName) ) {
 					// Found a key with child(ren)
 					var firstName = subKeyReg.matched(1);
@@ -506,8 +505,7 @@ class Main {
 			var all = [];
 			for(k in keys.keys())
 				all.push(k);
-			verbose(' -> Found: ${all.join(", ")}');
-			verbose(' -> ${all.length} key(s).');
+			verbose(' -> Found ${all.length} key(s): ${all.join(", ")}');
 		}
 	}
 
