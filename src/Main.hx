@@ -1,10 +1,5 @@
 import dn.Lib;
 
-typedef ExtractedKeys = {
-	var k: String;
-	var sub : Map<String,ExtractedKeys>;
-}
-
 class Main {
 	static var DEFAULT_TPL = "tpl/default.html";
 	static var DEFAULT_EMPTY_VALUE = "todo";
@@ -110,6 +105,14 @@ class Main {
 	}
 
 
+	static inline function isKeyNameReserved(k:String) {
+		return switch k {
+			case "zip/status", "zip/path": true;
+			case _: false;
+		}
+	}
+
+
 	/**
 		Create an empty data source file using an existing HTML template
 	**/
@@ -120,30 +123,24 @@ class Main {
 
 		// Extract HTML keys
 		var tplKeys : Map<String,String> = new Map();
-		var keysReg = ~/%([a-z_\/]+[0-9]*)%/im;
+		var keysReg = ~/%([a-z0-9_\/]+)%/im;
 		var tmp = rawTpl;
 		while( keysReg.match(tmp) ) {
 			var key = keysReg.matched(1);
-			switch key {
-				case "zip/status", "zip/path":
-					// Reserved: ignore
-
-				case _:
-					tplKeys.set(key,key);
-			}
+			if( !isKeyNameReserved(key) )
+				tplKeys.set(key,key);
 			tmp = keysReg.matchedRight();
 		}
-		var keyCount = 0;
-		for(k in tplKeys) keyCount++;
-		verbose(' -> Found $keyCount keys in HTML template.');
+		verbosePrintKeys(tplKeys);
 
 		var outRaw : String = "";
 
 		// Rebuild keys hierarchy
-		var subKeyReg = ~/^([a-z]+[0-9]*)\/(.+$)/i;
+		var subKeyReg = ~/^([a-z_0-9]+)\/(.+$)/i;
 		if( xml ) {
 			// Build XML
 			function _recXmlBuild(target:Xml, keyName:String) {
+				trace(keyName);
 				if( subKeyReg.match(keyName) ) {
 					// Found a key with child(ren)
 					var firstName = subKeyReg.matched(1);
@@ -228,7 +225,7 @@ class Main {
 		}
 
 		// Save file
-		Lib.println('Saving $keyCount keys to presskit ${xml?"XML":"JSON"}: ${srcFp.full}');
+		Lib.println('Saving keys to presskit ${xml?"XML":"JSON"}: ${srcFp.full}');
 		sys.io.File.saveContent(srcFp.full, outRaw);
 }
 
@@ -284,18 +281,14 @@ class Main {
 
 
 		// Extract HTML keys
-		var keysReg = ~/%([a-z_ ]+[0-9]*)%/im;
+		var keysReg = ~/%([a-z0-9_\/]+)%/im;
 		var tmp = rawTpl;
 		while( keysReg.match(tmp) ) {
 			var key = keysReg.matched(1);
 			tplKeys.set(key,key);
 			tmp = keysReg.matchedRight();
 		}
-		if( isVerbose ) {
-			var n = 0;
-			for(k in tplKeys) n++;
-			verbose(' -> Found $n keys in HTML template.');
-		}
+		verbosePrintKeys(tplKeys);
 
 		// Check missing JSON keys
 		for( tplKey in tplKeys.keys() )
@@ -483,11 +476,7 @@ class Main {
 		// Extract keys
 		var srcKeys : Map<String,String> = new Map();
 		iterateJson(json, srcKeys);
-		if( isVerbose ) {
-			var n = 0;
-			for(k in srcKeys) n++;
-			verbose(" -> Found "+n+" key(s) in JSON.");
-		}
+		verbosePrintKeys(srcKeys);
 
 		return srcKeys;
 	}
@@ -501,11 +490,7 @@ class Main {
 		// Extract keys
 		var srcKeys : Map<String,String> = new Map();
 		iterateXml(xml, srcKeys);
-		if( isVerbose ) {
-			var n = 0;
-			for(k in srcKeys) n++;
-			verbose(" -> Found "+n+" key(s) in XML.");
-		}
+		verbosePrintKeys(srcKeys);
 
 		return srcKeys;
 	}
@@ -514,6 +499,17 @@ class Main {
 	static function verbose(str:String) {
 		if( isVerbose )
 			Lib.println(str);
+	}
+
+	static function verbosePrintKeys(keys:Map<String,String>) {
+		if( isVerbose ) {
+			var all = [];
+			for(k in keys.keys())
+				if( !isKeyNameReserved(k) )
+					all.push(k);
+			verbose(' -> Found: ${all.join(", ")}');
+			verbose(' -> ${all.length} key(s).');
+		}
 	}
 
 
@@ -541,7 +537,7 @@ class Main {
 				continue;
 
 			containsSubNodes = true;
-			var key = parentKey==null ? c.name : parentKey+"_"+c.name;
+			var key = parentKey==null ? c.name : parentKey+"/"+c.name;
 
 			// Duplicates
 			if( allKeys.exists(key) )
@@ -561,7 +557,7 @@ class Main {
 	static function iterateJson(o:Dynamic, allKeys:Map<String,String>, ?parentKey:String) {
 		for(field in Reflect.fields(o)) {
 			var v : Dynamic = Reflect.field(o,field);
-			var key = ( parentKey==null ? "" : parentKey+"_" ) + field;
+			var key = ( parentKey==null ? "" : parentKey+"/" ) + field;
 			switch Type.typeof(v) {
 				case TNull:
 
