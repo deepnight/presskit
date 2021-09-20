@@ -1,19 +1,39 @@
 {
-	"gameTitle" : "Nuclear Blaze SCP",
-	"author" : "<a href='https://deepnight.net'>deepnight</a>",
 	"game" : {
+		"title" : "Nuclear Blaze SCP",
 		"release": 2021,
+		"platforms": [
+			"[PC](https://store.steampowered.com/app/1662480/Nuclear_Blaze/)"
+		],
 
 		"pitch" : [
 			"A *unique* 2D firefighting game from the creator of **Dead Cells**, with all the devastating backdrafts, exploding walls and sprinklers you could expect.",
 			"Fight your way through a ~~secret SCP complex~~ mysterious facility and try to keep the blaze under control."
 		],
+
+		"desc" : [
+			"Some cool **game description** here!"
+		],
+
 		"features": [
 			"- <strong>something cool</strong>",
 			"- another point",
 			"- oh and one last thing!"
 		],
-		"year" : 2021
+
+		"videos": "Coming soon!",
+
+		"images": [
+			"- <a href='img/screen0.png'><img src='img/screen0.png'/></a>",
+			"- <a href='img/screen1.png'><img src='img/screen1.png'/></a>",
+			"- <a href='img/screen2.png'><img src='img/screen2.png'/></a>"
+		],
+
+		"credits": [
+			"- **Code, Game design, Art:** Sébastien \"deepnight\" Benard",
+			"- More credits here",
+			"- Thank you everyone!"
+		]
 	},
 	"company" : {
 		"name": "[Deepnight Games](https://deepnight.net)"

@@ -13,7 +13,9 @@
 		Fight your way through a ~~secret SCP complex~~ mysterious facility and try to keep the blaze under control.
 	</pitch>
 
-	<desc></desc>
+	<desc>
+	Some cool **game description** here!
+	</desc>
 
 	<features>
 		- A unique 2D firefighting game with all the devastating backdrafts, exploding walls and sprinklers you could expect.
@@ -27,7 +29,7 @@
 	</features>
 	<release> 2021 </release>
 
-	<videos></videos>
+	<videos>Coming soon!</videos>
 
 	<images>
 		- <a href="img/screen0.png"><img src="img/screen0.png"/></a>
@@ -37,7 +39,8 @@
 
 	<credits>
 		- **Code, Game design, Art:** Sébastien "deepnight" Benard
-		- **Music:** Pentadrangle
+		- More credits here
+		- Thank you everyone!
 	</credits>
 </game>
 
