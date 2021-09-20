@@ -42,8 +42,10 @@ Now just edit your presskit file and fill in the fields.
 When you're ready to generate your HTML presskit page, run the following command:
 
 ```
-haxelib run presskit myPresskit.xml [-zip]
+haxelib run presskit -html myPresskit.xml [-zip]
 ```
+
+The `-html` indicates to switch to HTML generation mode.
 
 The optional `-zip` argument will generate a ZIP archive and add a "Download everything as ZIP" to the HTML page.
 
@@ -74,7 +76,7 @@ Run this command to extract all variables (eg. `%productName%`) and build a XML 
 You can then fill this file, and build your HTML final presskit using:
 
 ```
-haxelib run presskit myPresskitFile.xml myCustomTemplate.html
+haxelib run presskit -html myPresskitFile.xml myCustomTemplate.html
 ```
 
 # How does it work?

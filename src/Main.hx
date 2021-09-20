@@ -92,10 +92,10 @@ class Main {
 
 			extractFromTemplate( srcFp.extension.toLowerCase()=="xml" );
 		}
-		else {
+		else if( args.hasArg("-html") || args.hasArg("-h") ) {
 			// HTML presskit builder
 			if( srcFp==null )
-				usage();
+				error('Missing presskit source file (XML or JSON)', true);
 
 			if( !sys.FileSystem.exists(srcFp.full) && argSrc==null )
 				usage();
@@ -104,6 +104,8 @@ class Main {
 
 			buildHtml();
 		}
+		else
+			usage();
 	}
 
 
@@ -599,10 +601,10 @@ class Main {
 			Lib.println("NORMAL USAGE:");
 			Lib.println('  In this mode, an HTML static page is generated using a HTML template + a presskit source file (xml or json)');
 			Lib.println("");
-			Lib.println("    haxelib run presskit <xml_or_json_presskit> [<html_template>] [-zip] [-v]");
+			Lib.println("    haxelib run presskit -html <xml_or_json_presskit> [<html_template>] [-zip] [-v]");
 			Lib.println("");
-			Lib.println('    <xml_or_json_presskit>: path to your presskit XML or JSON');
-			Lib.println('    <html_template>: optional path to your own custom HTML template (default is "./$DEFAULT_TPL", from the Presskit lib folder)');
+			Lib.println('  <xml_or_json_presskit>: path to your presskit XML or JSON');
+			Lib.println('  <html_template>: optional path to your own custom HTML template (default is "./$DEFAULT_TPL", from the Presskit lib folder)');
 			Lib.println("");
 			Lib.println('  Note: basic markdown style formatting is supported in your source file: bold (**), italic (*), striked (~~), lists, nested lists and links ( [desc](url) ).');
 			Lib.println('  See "demo" folder for some examples.');
@@ -613,11 +615,12 @@ class Main {
 			Lib.println("");
 			Lib.println("    haxelib run presskit -extract [<html_to_extract>] <output_presskit_file> [-v]");
 			Lib.println("");
-			Lib.println('    -extract | -x: enable Extraction mode');
-			Lib.println('    <html_to_extract>: HTML file to parse and to extract keys from (default is "./$DEFAULT_TPL", from the Presskit lib folder)');
-			Lib.println('    <output_presskit_file>: output presskit file to generated (with either ".xml" or ".json" extension)');
+			Lib.println('  <html_to_extract>: HTML file to parse and to extract keys from (default is "./$DEFAULT_TPL", from the Presskit lib folder)');
+			Lib.println('  <output_presskit_file>: output presskit file to generated (with either ".xml" or ".json" extension)');
 			Lib.println('');
 			Lib.println('ARGUMENTS:');
+			Lib.println('    -html | -h: enable HTML mode');
+			Lib.println('    -extract | -x: enable Extraction mode');
 			Lib.println('    -zip: create a ZIP archive (and a link to it in the template if it supports that. See default template for an example)');
 			Lib.println('    -force: bypass confirmations and overwrite everything');
 			Lib.println('    -verbose | -v: enable Verbose mode');

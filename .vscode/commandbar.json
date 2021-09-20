@@ -23,7 +23,7 @@
       {
         "text": "From XML",
         "color": "cyan",
-        "command": "haxelib run presskit demo/xml_demo.xml -v -zip  &&  start demo\\xml_demo_html\\xml_demo.html",
+        "command": "haxelib run presskit -html demo/xml_demo.xml -v -zip  &&  start demo\\xml_demo_html\\xml_demo.html",
         "alignment": "right",
         "skipTerminateQuickPick": false,
         "priority": 3
@@ -31,7 +31,7 @@
       {
         "text": "From JSON",
         "color": "cyan",
-        "command": "haxelib run presskit demo/json_demo.json -v -zip  &&  start demo\\json_demo_html\\json_demo.html",
+        "command": "haxelib run presskit -html demo/json_demo.json -v -zip  &&  start demo\\json_demo_html\\json_demo.html",
         "alignment": "right",
         "skipTerminateQuickPick": false,
         "priority": 2
