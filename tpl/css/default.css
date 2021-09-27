@@ -53,6 +53,11 @@ body {
   font-size: 3em;
 }
 
+.presskit strike {
+  opacity: 0.5;
+  font-style: italic;
+}
+
 .presskit img {
   max-width: 100%;
 }
