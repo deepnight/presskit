@@ -4,9 +4,9 @@
   "license": "Apache",
   "tags": ["presskit","press"],
   "description": "A simple lib to turn a XML or JSON to a static presskit HTML page. Super easy to extend and adapt to your own needs, without having to modify the source code!",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "classPath": "src/",
-  "releasenote": "Added HTML template to XML/JSON extraction. Variable name format changed (%game_name% => %game/name%). Got rid of Neko. Updated demo. Better README doc.",
+  "releasenote": "Added strike-through CSS",
   "contributors": ["sbenard"],
   "dependencies": {
     "deepnightLibs":""
