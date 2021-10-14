@@ -512,9 +512,9 @@ class Main {
 
 
 	static var HTML_TAGS = [
-		"p", "div", "span", "pre", "a", "q", "quote", "blockquote",
+		"p", "div", "span", "pre", "a", "q", "quote", "blockquote","iframe",
 		"ul", "dl", "ol", "li", "dt", "dd",
-		"table", "form", "img",
+		"table", "form", "img","video",
 		"h1", "h2", "h3", "h4", "h5", "h6",
 		"em", "i", "strong", "b",
 		"br", "hr",
