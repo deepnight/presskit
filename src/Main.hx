@@ -88,10 +88,10 @@ class Main {
 
 			extractFromTemplate( srcFp.extension.toLowerCase()=="xml" );
 		}
-		else if( args.hasArg("-html") || args.hasArg("-h") ) {
+		else if( srcFp!=null ) {
 			// HTML presskit builder
-			if( srcFp==null )
-				error('Missing presskit source file (XML or JSON)', true);
+			// if( srcFp==null )
+			// 	error('Missing presskit source file (XML or JSON)', true);
 
 			if( !sys.FileSystem.exists(srcFp.full) && argSrc==null )
 				usage();
@@ -600,7 +600,7 @@ class Main {
 			Lib.println("NORMAL USAGE:");
 			Lib.println('  In this mode, an HTML static page is generated using a HTML template + a presskit source file (xml or json)');
 			Lib.println("");
-			Lib.println("    haxelib run presskit -html <xml_or_json_presskit> [<html_template>] [-zip] [-v]");
+			Lib.println("    haxelib run presskit <xml_or_json_presskit> [<html_template>] [-zip] [-v]");
 			Lib.println("");
 			Lib.println('  <xml_or_json_presskit>: path to your presskit XML or JSON');
 			Lib.println('  <html_template>: optional path to your own custom HTML template (default is "./$DEFAULT_TPL", from the Presskit lib folder)');
@@ -618,8 +618,7 @@ class Main {
 			Lib.println('  <output_presskit_file>: output presskit file to generated (with either ".xml" or ".json" extension)');
 			Lib.println('');
 			Lib.println('ARGUMENTS:');
-			Lib.println('    -html | -h: enable HTML mode');
-			Lib.println('    -extract | -x: enable Extraction mode');
+			Lib.println('    -extract | -x: use Extraction mode');
 			Lib.println('    -zip: create a ZIP archive (and a link to it in the template if it supports that. See default template for an example)');
 			Lib.println('    -force: bypass confirmations and overwrite everything');
 			Lib.println('    -verbose | -v: enable Verbose mode');
