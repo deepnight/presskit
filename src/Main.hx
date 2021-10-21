@@ -50,7 +50,7 @@ class Main {
 		// Init dirs
 		var haxelibDir = dn.FilePath.cleanUp( Sys.getCwd(), false );
 		var projectDir = dn.FilePath.cleanUp( args.getLastSoloValue(), false );
-		tplFp = dn.FilePath.fromFile( argTpl!=null ? argTpl : haxelibDir +"/"+ DEFAULT_TPL);
+		tplFp = dn.FilePath.fromFile( argTpl!=null ? projectDir+"/"+argTpl : haxelibDir +"/"+ DEFAULT_TPL);
 		srcFp = argSrc==null ? null : dn.FilePath.fromFile( projectDir+"/"+argSrc );
 
 		// Detect mode
