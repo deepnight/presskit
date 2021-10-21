@@ -276,7 +276,7 @@ class Main {
 
 
 		// Read HTML template
-		verbose('Reading HTML template: ${tplFp.full}}...');
+		verbose('Reading HTML template: ${tplFp.full}...');
 		var rawTpl = try sys.io.File.getContent(tplFp.full) catch(_) { error('Could not open: ${tplFp.full}'); null; }
 
 
