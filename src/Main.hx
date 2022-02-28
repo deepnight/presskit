@@ -382,6 +382,27 @@ class Main {
 			tmp = DEPENDENCY_URI_REG.matchedRight();
 		}
 
+		// Crawl CSS dependencies
+		for( f in dependencies ) {
+			var fp = dn.FilePath.fromFile( tplFp.directory+"/"+f );
+			if( fp.extension!="css" )
+				continue;
+
+			if( !sys.FileSystem.exists(fp.full) )
+				error("CSS not found: "+fp.full);
+
+			// List refs in CSS
+			var rawCss = sys.io.File.getContent(fp.full);
+			while( DEPENDENCY_URI_REG.match(rawCss) ) {
+				var cssUrl = DEPENDENCY_URI_REG.matched(1);
+				var cssAbsFp = dn.FilePath.fromFile( fp.directoryWithSlash + cssUrl );
+				cssAbsFp.makeRelativeTo(tplFp.directory);
+				dependencies.push(cssAbsFp.full);
+				rawCss = DEPENDENCY_URI_REG.matchedRight();
+			}
+		}
+
+
 		// Copy dependencies
 		verbose('Copying template dependencies (${dependencies.length})...');
 		for( f in dependencies ) {
