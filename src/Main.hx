@@ -526,13 +526,26 @@ class Main {
 		m;
 	}
 
+	/**
+		Adjust existing HTML tags
+	**/
+	static function adjustHtmlTag(node:haxe.xml.Access) {
+		switch node.name.toLowerCase() {
+			case "img":
+				node.get_x().set("loading","lazy");
+
+			case _:
+		}
+	}
 
 	static function iterateXml(node:haxe.xml.Access, allKeys:Map<String,String>, ?parentKey:String) {
 		var containsSubNodes = false;
 
 		for(c in node.elements) {
-			if( IGNORED_HTML_TAGS.exists(c.name.toLowerCase()) )
+			if( IGNORED_HTML_TAGS.exists(c.name.toLowerCase()) ) {
+				adjustHtmlTag(c);
 				continue;
+			}
 
 			containsSubNodes = true;
 			var key = parentKey==null ? c.name : parentKey+"/"+c.name;
